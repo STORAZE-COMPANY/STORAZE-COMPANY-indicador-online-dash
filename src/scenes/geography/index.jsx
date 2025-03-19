@@ -7,7 +7,8 @@ const Geography = () => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box m="20px">
-      <Header title="Geography" subtitle="Simple Geography Chart" />
+      {/* <Header title="Geography" subtitle="Simple Geography Chart" /> */}
+      <Header title="Gráfico" subtitle="Gráfico" />
 
       <Box
         height="75vh"

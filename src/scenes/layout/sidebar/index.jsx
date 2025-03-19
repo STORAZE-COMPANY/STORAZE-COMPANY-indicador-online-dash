@@ -221,14 +221,14 @@ const SideBar = () => {
             icon={<HelpOutlineOutlined />}
           /> 
         </Menu> */}
-        {/*  <Typography
+          <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
         >
-          {!collapsed ? "Charts" : " "}
-        </Typography> */}
-        {/*    <Menu
+          {!collapsed ? "Analytics" : " "}
+        </Typography> 
+          <Menu
           menuItemStyles={{
             button: {
               ":hover": {
@@ -269,7 +269,7 @@ const SideBar = () => {
             colors={colors}
             icon={<WavesOutlined />}
           />
-        </Menu> */}
+        </Menu> 
       </Box>
     </Sidebar>
   );
