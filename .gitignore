@@ -1,0 +1,42 @@
+# Node.js
+/node_modules
+/.pnp
+.pnp.js
+
+# Build output
+/dist
+/build
+
+# Local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+/.idea
+/.vscode
+
+# Log files
+*.log
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# npm package lock
+package-lock.json
+
+# Yarn package lock
+yarn.lock
+
+# vite build files
+/.vite
+
+# Dependency directories
+/node_modules/
+
+# OS generated files
+ehthumbs.db
