@@ -117,7 +117,7 @@ const SideBar = () => {
       )}
 
       <Box mb={5} pl={collapsed ? undefined : "5%"}>
-        <Menu
+        {/*  <Menu
           menuItemStyles={{
             button: {
               ":hover": {
@@ -134,14 +134,14 @@ const SideBar = () => {
             colors={colors}
             icon={<DashboardOutlined />}
           />
-        </Menu>
-        <Typography
+        </Menu>  */}
+        {/*  <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
         >
           {!collapsed ? "Data" : " "}
-        </Typography>{" "}
+        </Typography>{" "} */}
         <Menu
           menuItemStyles={{
             button: {
@@ -154,17 +154,18 @@ const SideBar = () => {
           }}
         >
           <Item
-            title="Gerenciar equipe"
-            path="/team"
-            colors={colors}
-            icon={<PeopleAltOutlined />}
-          />
-          <Item
             title="CheckList"
             path="/checklist"
             colors={colors}
             icon={<PeopleAltOutlined />}
           />
+          <Item
+            title="Gerenciar equipe"
+            path="/team"
+            colors={colors}
+            icon={<PeopleAltOutlined />}
+          />
+
           <Item
             title="Criar usuário"
             path="/form"
@@ -221,7 +222,7 @@ const SideBar = () => {
             icon={<HelpOutlineOutlined />}
           /> 
         </Menu> */}
-          <Typography
+        {/*  <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
@@ -269,7 +270,7 @@ const SideBar = () => {
             colors={colors}
             icon={<WavesOutlined />}
           />
-        </Menu> 
+        </Menu>   */}
       </Box>
     </Sidebar>
   );
