@@ -149,7 +149,7 @@ const Checklist = () => {
             {category.questions.map((question, questionIndex) => (
               <Box
                 key={questionIndex}
-                sx={{ marginBottom: "20px", marginLeft: "20px" }}
+                sx={{ marginBottom: "20px", marginLeft: "20px", backgroundColor: "#6F7484", padding: '20px', borderRadius:2 }}
               >
                 <TextField
                   label={`Pergunta ${questionIndex + 1}`}
