@@ -8,8 +8,9 @@ import {
   CalendarTodayOutlined,
   ContactsOutlined,
   DashboardOutlined,
-  DonutLargeOutlined,
+  ApartmentOutlined,
   HelpOutlineOutlined,
+  ChecklistOutlined,
   MapOutlined,
   MenuOutlined,
   PeopleAltOutlined,
@@ -157,7 +158,13 @@ const SideBar = () => {
             title="CheckList"
             path="/checklist"
             colors={colors}
-            icon={<PeopleAltOutlined />}
+            icon={<ChecklistOutlined />}
+          />
+          <Item
+            title="Criar empresa"
+            path="/form"
+            colors={colors}
+            icon={<ApartmentOutlined />}
           />
           <Item
             title="Gerenciar equipe"

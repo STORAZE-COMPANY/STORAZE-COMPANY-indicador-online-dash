@@ -8,14 +8,14 @@ import {
   Typography,
   Divider,
   useTheme,
+  Grid, // Importando o Grid para organização lado a lado
 } from "@mui/material";
-import { AddCircleOutline, Delete } from "@mui/icons-material"; 
+import { AddCircleOutline, Delete } from "@mui/icons-material";
 import { useState } from "react";
 import { tokens } from "../../theme";
 
 const Checklist = () => {
   const theme = useTheme();
-
   const colors = tokens(theme.palette.mode);
 
   const [checklistName, setChecklistName] = useState("");
@@ -149,7 +149,13 @@ const Checklist = () => {
             {category.questions.map((question, questionIndex) => (
               <Box
                 key={questionIndex}
-                sx={{ marginBottom: "20px", marginLeft: "20px", backgroundColor: "#6F7484", padding: '20px', borderRadius:2 }}
+                sx={{
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  backgroundColor: "#6F7484",
+                  padding: "20px",
+                  borderRadius: 2,
+                }}
               >
                 <TextField
                   label={`Pergunta ${questionIndex + 1}`}
@@ -166,44 +172,112 @@ const Checklist = () => {
                   }
                   sx={{ marginBottom: "10px" }}
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={question.isRequired}
-                      onChange={(e) =>
-                        handleChangeQuestion(
-                          categoryIndex,
-                          questionIndex,
-                          "isRequired",
-                          e.target.checked
-                        )
+
+                {/* Grid para as duas seções lado a lado */}
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    {/* Tipo de pergunta */}
+                    <Typography variant="h6" gutterBottom>
+                      Tipo de pergunta:
+                    </Typography>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={question.isPhotoRequired}
+                          onChange={(e) =>
+                            handleChangeQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "isPhotoRequired",
+                              e.target.checked
+                            )
+                          }
+                        />
                       }
+                      label="Foto"
+                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
-                  }
-                  label="É obrigatório?"
-                  sx={{ marginBottom: "10px", color: "#fff" }}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={question.isPhotoRequired}
-                      onChange={(e) =>
-                        handleChangeQuestion(
-                          categoryIndex,
-                          questionIndex,
-                          "isPhotoRequired",
-                          e.target.checked
-                        )
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={question.question === "SIM e NÃO"}
+                          onChange={(e) =>
+                            handleChangeQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "question",
+                              e.target.checked ? "SIM e NÃO" : ""
+                            )
+                          }
+                        />
                       }
+                      label="Sim e Não"
+                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
-                  }
-                  label="É necessário foto?"
-                  sx={{ marginBottom: "10px", color: "#fff" }}
-                />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={question.question === "Texto"}
+                          onChange={(e) =>
+                            handleChangeQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "question",
+                              e.target.checked ? "Texto" : ""
+                            )
+                          }
+                        />
+                      }
+                      label="Texto"
+                      sx={{ marginBottom: "10px", color: "#fff" }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    {/* Obrigatoriedade */}
+                    <Typography variant="h6" gutterBottom>
+                      Obrigatoriedade:
+                    </Typography>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={question.isRequired}
+                          onChange={(e) =>
+                            handleChangeQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "isRequired",
+                              e.target.checked
+                            )
+                          }
+                        />
+                      }
+                      label="Obrigatório responder"
+                      sx={{ marginBottom: "10px", color: "#fff" }}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={question.question === "Foto obrigatória"}
+                          onChange={(e) =>
+                            handleChangeQuestion(
+                              categoryIndex,
+                              questionIndex,
+                              "isRequiredPhoto",
+                              e.target.checked
+                            )
+                          }
+                        />
+                      }
+                      label="Foto obrigatória"
+                      sx={{ marginBottom: "10px", color: "#fff" }}
+                    />
+                  </Grid>
+                </Grid>
 
                 {/* Botão para excluir a pergunta */}
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   color="error"
                   startIcon={<Delete />}
                   onClick={() =>
