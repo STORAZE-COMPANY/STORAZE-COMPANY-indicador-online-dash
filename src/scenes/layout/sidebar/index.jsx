@@ -20,7 +20,7 @@ import {
   WavesOutlined,
 } from "@mui/icons-material";
 import avatar from "../../../assets/images/fabio-vivas.jpeg";
-import logo from "../../../assets/images/logo.png";
+import logo from "../../../assets/images/logo-cliente.jpeg";
 import Item from "./Item";
 import { ToggledContext } from "../../../App";
 
@@ -66,11 +66,11 @@ const SideBar = () => {
                 gap="12px"
                 sx={{ transition: ".3s ease" }}
               >
-                {/*   <img
-                  style={{ width: "30px", height: "30px", borderRadius: "8px" }}
+                   <img
+                  style={{ width: "35px", height: "35px", borderRadius: "8px" }}
                   src={logo}
                   alt="Argon"
-                /> */}
+                /> 
                 <Typography
                   variant="h4"
                   fontWeight="bold"
