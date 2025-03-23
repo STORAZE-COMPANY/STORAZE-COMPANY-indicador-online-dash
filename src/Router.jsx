@@ -16,6 +16,8 @@ import {
   Stream,
 } from "./scenes";
 import Checklist from "./scenes/checklist";
+import Company from "./scenes/company";
+import CreateCompany from "./scenes/company/create-company";
 
 const AppRouter = () => {
   return (
@@ -24,6 +26,8 @@ const AppRouter = () => {
         <Route path="/" element={<App />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/create-company" element={<CreateCompany />} />
+          <Route path="/company" element={<Company />} />
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/invoices" element={<Invoices />} />

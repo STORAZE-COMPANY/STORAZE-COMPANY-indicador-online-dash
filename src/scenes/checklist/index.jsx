@@ -1,4 +1,7 @@
+import { useState } from "react";
+
 import { Header } from "../../components";
+import { AddCircleOutline, Delete } from "@mui/icons-material";
 import {
   TextField,
   Button,
@@ -8,10 +11,9 @@ import {
   Typography,
   Divider,
   useTheme,
-  Grid, // Importando o Grid para organização lado a lado
+  Grid,
 } from "@mui/material";
-import { AddCircleOutline, Delete } from "@mui/icons-material";
-import { useState } from "react";
+
 import { tokens } from "../../theme";
 
 const Checklist = () => {
@@ -22,7 +24,15 @@ const Checklist = () => {
   const [categories, setCategories] = useState([
     {
       categoryName: "",
-      questions: [{ question: "", isRequired: false, isPhotoRequired: false }],
+      questions: [
+        {
+          questionText: "",
+          questionType: "", // "Foto", "SIM e NÃO" ou "Texto"
+          isRequired: false,
+          isRequiredPhoto: false,
+          position: 1,
+        },
+      ],
     },
   ]);
 
@@ -44,6 +54,7 @@ const Checklist = () => {
       question: "",
       isRequired: false,
       isPhotoRequired: false,
+      position: newCategories[categoryIndex].questions.length + 1,
     });
     setCategories(newCategories);
   };
@@ -161,21 +172,19 @@ const Checklist = () => {
                   label={`Pergunta ${questionIndex + 1}`}
                   variant="outlined"
                   fullWidth
-                  value={question.question}
+                  value={question.questionText}
                   onChange={(e) =>
                     handleChangeQuestion(
                       categoryIndex,
                       questionIndex,
-                      "question",
+                      "questionText",
                       e.target.value
                     )
                   }
-                  sx={{ marginBottom: "10px" }}
                 />
-
                 {/* Grid para as duas seções lado a lado */}
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                <Grid container spacing={2} marginTop={3} marginBottom={3}>
+                  <Grid item xs={4}>
                     {/* Tipo de pergunta */}
                     <Typography variant="h6" gutterBottom>
                       Tipo de pergunta:
@@ -183,57 +192,56 @@ const Checklist = () => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.isPhotoRequired}
-                          onChange={(e) =>
+                          checked={question.questionType === "Foto"}
+                          onChange={() =>
                             handleChangeQuestion(
                               categoryIndex,
                               questionIndex,
-                              "isPhotoRequired",
-                              e.target.checked
+                              "questionType",
+                              "Foto"
                             )
                           }
                         />
                       }
                       label="Foto"
-                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
+
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.question === "SIM e NÃO"}
-                          onChange={(e) =>
+                          checked={question.questionType === "SIM e NÃO"}
+                          onChange={() =>
                             handleChangeQuestion(
                               categoryIndex,
                               questionIndex,
-                              "question",
-                              e.target.checked ? "SIM e NÃO" : ""
+                              "questionType",
+                              "SIM e NÃO"
                             )
                           }
                         />
                       }
                       label="Sim e Não"
-                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
+
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.question === "Texto"}
-                          onChange={(e) =>
+                          checked={question.questionType === "Texto"}
+                          onChange={() =>
                             handleChangeQuestion(
                               categoryIndex,
                               questionIndex,
-                              "question",
-                              e.target.checked ? "Texto" : ""
+                              "questionType",
+                              "Texto"
                             )
                           }
                         />
                       }
                       label="Texto"
-                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item xs={4}>
                     {/* Obrigatoriedade */}
                     <Typography variant="h6" gutterBottom>
                       Obrigatoriedade:
@@ -253,12 +261,11 @@ const Checklist = () => {
                         />
                       }
                       label="Obrigatório responder"
-                      sx={{ marginBottom: "10px", color: "#fff" }}
                     />
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.question === "Foto obrigatória"}
+                          checked={question.isRequiredPhoto}
                           onChange={(e) =>
                             handleChangeQuestion(
                               categoryIndex,
@@ -270,7 +277,32 @@ const Checklist = () => {
                         />
                       }
                       label="Foto obrigatória"
-                      sx={{ marginBottom: "10px", color: "#fff" }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <Typography variant="h6" gutterBottom>
+                      Posição da pergunta:
+                    </Typography>
+                    <TextField
+                      type="number"
+                      label="Posição"
+                      variant="outlined"
+                      value={question.position}
+                      InputProps={{ inputProps: { min: 1 } }}
+                      onChange={(e) => {
+                        const posValue = Math.max(
+                          1,
+                          parseInt(e.target.value) || 1
+                        );
+                        handleChangeQuestion(
+                          categoryIndex,
+                          questionIndex,
+                          "position",
+                          posValue
+                        );
+                      }}
+                      sx={{ marginBottom: "10px" }}
                     />
                   </Grid>
                 </Grid>

@@ -161,8 +161,8 @@ const SideBar = () => {
             icon={<ChecklistOutlined />}
           />
           <Item
-            title="Criar empresa"
-            path="/form"
+            title="Gerenciar empresa"
+            path="/company"
             colors={colors}
             icon={<ApartmentOutlined />}
           />
