@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Header } from "../../components";
 import { AddCircleOutline, Delete } from "@mui/icons-material";
+
 import {
   TextField,
   Button,
@@ -16,6 +17,9 @@ import {
 
 import { tokens } from "../../theme";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Checklist = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -27,7 +31,7 @@ const Checklist = () => {
       questions: [
         {
           questionText: "",
-          questionType: "", // "Foto", "SIM e NÃO" ou "Texto"
+          questionType: [], // "Foto", "SIM e NÃO" ou "Texto"
           isRequired: false,
           isRequiredPhoto: false,
           position: 1,
@@ -52,6 +56,7 @@ const Checklist = () => {
     const newCategories = [...categories];
     newCategories[categoryIndex].questions.push({
       question: "",
+      questionType: [],
       isRequired: false,
       isPhotoRequired: false,
       position: newCategories[categoryIndex].questions.length + 1,
@@ -67,7 +72,27 @@ const Checklist = () => {
 
   const handleChangeQuestion = (categoryIndex, questionIndex, field, value) => {
     const newCategories = [...categories];
-    newCategories[categoryIndex].questions[questionIndex][field] = value;
+  
+    if (field === "position") {
+      const newPosition = Math.max(1, parseInt(value) || 1);
+  
+      // Verifica se já existe uma pergunta com essa posição na mesma categoria
+      const isPositionTaken = newCategories[categoryIndex].questions.some(
+        (q, idx) => idx !== questionIndex && q.position === newPosition
+      );
+  
+      if (isPositionTaken) {
+        toast.error('Essa posição já está em uso. Escolha outra!');
+
+        //alert("Essa posição já está em uso. Escolha outra.");
+        return;
+      }
+  
+      newCategories[categoryIndex].questions[questionIndex][field] = newPosition;
+    } else {
+      newCategories[categoryIndex].questions[questionIndex][field] = value;
+    }
+  
     setCategories(newCategories);
   };
 
@@ -192,21 +217,28 @@ const Checklist = () => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.questionType === "Foto"}
-                          onChange={() =>
+                          checked={question.questionType.includes("Foto")}
+                          onChange={() => {
+                            const newTypes = question.questionType.includes(
+                              "Foto"
+                            )
+                              ? question.questionType.filter(
+                                  (t) => t !== "Foto"
+                                )
+                              : [...question.questionType, "Foto"];
                             handleChangeQuestion(
                               categoryIndex,
                               questionIndex,
                               "questionType",
-                              "Foto"
-                            )
-                          }
+                              newTypes
+                            );
+                          }}
                         />
                       }
                       label="Foto"
                     />
 
-                    <FormControlLabel
+                    {/* <FormControlLabel
                       control={
                         <Checkbox
                           checked={question.questionType === "SIM e NÃO"}
@@ -221,20 +253,27 @@ const Checklist = () => {
                         />
                       }
                       label="Sim e Não"
-                    />
+                    /> */}
 
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={question.questionType === "Texto"}
-                          onChange={() =>
+                          checked={question.questionType.includes("Texto")}
+                          onChange={() => {
+                            const newTypes = question.questionType.includes(
+                              "Texto"
+                            )
+                              ? question.questionType.filter(
+                                  (t) => t !== "Texto"
+                                )
+                              : [...question.questionType, "Texto"];
                             handleChangeQuestion(
                               categoryIndex,
                               questionIndex,
                               "questionType",
-                              "Texto"
-                            )
-                          }
+                              newTypes
+                            );
+                          }}
                         />
                       }
                       label="Texto"
@@ -359,6 +398,8 @@ const Checklist = () => {
           Criar Checklist
         </Button>
       </Box>
+      <ToastContainer />
+
     </Box>
   );
 };

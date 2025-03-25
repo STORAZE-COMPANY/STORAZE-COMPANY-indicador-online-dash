@@ -4,9 +4,11 @@ import { ColorModeContext, useMode } from "./theme";
 import { Navbar, SideBar } from "./scenes";
 import { Outlet } from "react-router-dom";
 
+
 export const ToggledContext = createContext(null);
 
 function App() {
+
   const [theme, colorMode] = useMode();
   const [toggled, setToggled] = useState(false);
   const values = { toggled, setToggled };
