@@ -11,31 +11,28 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { tokens } from "../../theme";
 import api from "../../api/axios";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login = () => {
   const darkTheme = createTheme({ palette: { mode: "dark" } });
   const theme = useTheme();
-  const colors = tokens("dark"); // 👈 força o modo dark
+  const colors = tokens("dark");
   const navigate = useNavigate();
+  const {login} = useAuth(); 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post("/auth/login", { email, password });
 
-      console.log("response", response)
-  
       const { access_token } = response.data;
-  
-      localStorage.setItem("token", access_token);
-      localStorage.setItem("auth", "true");
-  
-      navigate("/checklists");
+
+
+     login(access_token);
+
+    navigate("/checklists"); 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert("Credenciais inválidas ou erro na API.");
@@ -50,7 +47,6 @@ const Login = () => {
         alignItems="center"
         height="100vh"
         bgcolor={colors.primary[500]}
-        border={0}
       >
         <Box
           width="400px"
@@ -62,6 +58,7 @@ const Login = () => {
           <Typography variant="h4" mb={2} color={colors.greenAccent[400]}>
             Login
           </Typography>
+
           <TextField
             fullWidth
             label="Email"
@@ -72,6 +69,7 @@ const Login = () => {
             InputProps={{ style: { color: colors.grey } }}
             InputLabelProps={{ style: { color: colors.grey } }}
           />
+
           <TextField
             fullWidth
             label="Senha"
@@ -82,6 +80,7 @@ const Login = () => {
             InputProps={{ style: { color: colors.grey } }}
             InputLabelProps={{ style: { color: colors.grey } }}
           />
+
           <Button
             fullWidth
             variant="contained"

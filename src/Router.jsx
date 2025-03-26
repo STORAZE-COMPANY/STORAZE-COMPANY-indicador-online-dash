@@ -21,14 +21,24 @@ import CreateCompany from "./scenes/company/create-company";
 import Login from "./scenes/login";
 import ChecklistForm from "./scenes/checklist/create-checklist";
 import ChecklistList from "./scenes/checklist";
+import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 
 const AppRouter = () => {
   return (
     <Router>
       <Routes>
-          <Route path="/login" element={<Login />} />
-        <Route path="/" element={<App />}>
-          <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+
+     <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+
           <Route path="/team" element={<Team />} />
           <Route path="/create-company" element={<CreateCompany />} />
           <Route path="/company" element={<Company />} />
