@@ -19,6 +19,8 @@ import Checklist from "./scenes/checklist";
 import Company from "./scenes/company";
 import CreateCompany from "./scenes/company/create-company";
 import Login from "./scenes/login";
+import ChecklistForm from "./scenes/checklist/create-checklist";
+import ChecklistList from "./scenes/checklist";
 
 const AppRouter = () => {
   return (
@@ -30,7 +32,10 @@ const AppRouter = () => {
           <Route path="/team" element={<Team />} />
           <Route path="/create-company" element={<CreateCompany />} />
           <Route path="/company" element={<Company />} />
-          <Route path="/checklist" element={<Checklist />} />
+
+          <Route path="/checklists" element={<ChecklistList />} />
+          <Route path="/checklistform" element={<ChecklistForm />} />
+
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/form" element={<Form />} />

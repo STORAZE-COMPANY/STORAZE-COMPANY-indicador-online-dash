@@ -13,6 +13,7 @@ const mockDataEmpresas = [
     contacto: "+351 912 345 678",
     email: "info@translog.pt",
     status: "Ativa",
+    checklists: ["Segurança", "TI"],
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const mockDataEmpresas = [
     contacto: "+351 923 456 789",
     email: "contato@rapidotrans.pt",
     status: "Inativa",
+    checklists: ["Limpeza"],
   },
   {
     id: 3,
@@ -29,6 +31,7 @@ const mockDataEmpresas = [
     contacto: "+351 934 567 890",
     email: "apoio@cargacerta.pt",
     status: "Ativa",
+    checklists: ["Frota", "TI", "Segurança"],
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ const mockDataEmpresas = [
     contacto: "+351 945 678 901",
     email: "express@entregasexpress.pt",
     status: "Ativa",
+    checklists: [],
   },
   {
     id: 5,
@@ -45,6 +49,7 @@ const mockDataEmpresas = [
     contacto: "+351 956 789 012",
     email: "suporte@velozcargo.pt",
     status: "Inativa",
+    checklists: ["TI"],
   },
 ];
 
@@ -84,6 +89,35 @@ const Company = () => {
         </Box>
       ),
     },
+    {
+      field: "checklists",
+      headerName: "Checklists",
+      flex: 1.5,
+      renderCell: ({ row: { checklists } }) => (
+        <Box display="flex" flexWrap="wrap" gap={1}>
+          {checklists?.length ? (
+            checklists.map((name, idx) => (
+              <Box
+                key={idx}
+                px={1}
+                py={0.5}
+                borderRadius={1}
+                bgcolor={colors.blueAccent[600]}
+              >
+                <Typography variant="caption" color="#fff">
+                  {name}
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="caption" color="gray">
+              Nenhum checklist
+            </Typography>
+          )}
+        </Box>
+      ),
+    },
+    
   ];
 
   const handleCriarEmpresaClick = () => {

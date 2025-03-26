@@ -156,7 +156,7 @@ const SideBar = () => {
         >
           <Item
             title="CheckList"
-            path="/checklist"
+            path="/checklists"
             colors={colors}
             icon={<ChecklistOutlined />}
           />

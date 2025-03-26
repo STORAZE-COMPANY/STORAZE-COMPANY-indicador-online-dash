@@ -35,7 +35,7 @@ const Login = () => {
       localStorage.setItem("token", access_token);
       localStorage.setItem("auth", "true");
   
-      navigate("/checklist");
+      navigate("/checklists");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert("Credenciais inválidas ou erro na API.");

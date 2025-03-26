@@ -1,38 +1,57 @@
-import { Box, Button, TextField, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  useMediaQuery,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+} from "@mui/material";
 import { Header } from "../../components";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { useState } from "react";
+import api from "../../api/axios";
+import { toast } from "react-toastify";
+
+// mock de checklists
+const MOCKED_CHECKLISTS = [
+  { id: 1, name: "Checklist de Segurança" },
+  { id: 2, name: "Checklist de Limpeza" },
+  { id: 3, name: "Checklist de TI" },
+];
 
 const initialValues = {
-  nomeEmpresa: "",
-  cidade: "",
-  contacto: "",
+  name: "",
+  cnpj: "",
   email: "",
-  endereco: "",
+  address: "",
+  contact: "",
+  isActive: true,
+  checklistIds: [],
 };
 
-const phoneRegExp =
-  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
 const empresaSchema = yup.object().shape({
-  nomeEmpresa: yup.string().required("Campo obrigatório"),
-  cidade: yup.string().required("Campo obrigatório"),
-  contacto: yup
-    .string()
-    .matches(phoneRegExp, "Número inválido")
-    .required("Campo obrigatório"),
+  name: yup.string().required("Campo obrigatório"),
+  cnpj: yup.string().required("Campo obrigatório"),
+  contact: yup.string().required("Campo obrigatório"),
   email: yup.string().email("Email inválido").required("Campo obrigatório"),
-  endereco: yup.string().required("Campo obrigatório"),
+  address: yup.string().required("Campo obrigatório"),
+  checklistIds: yup.array().min(1, "Selecione ao menos um checklist"),
 });
 
 const CreateCompany = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values, actions) => {
-    console.log(values);
-    actions.resetForm({
-      values: initialValues,
-    });
+  const handleFormSubmit = async (values, actions) => {
+    try {
+      await api.post("/companies", values);
+      toast.success("Empresa criada com sucesso!");
+      actions.resetForm({ values: initialValues });
+    } catch (err) {
+      toast.error("Erro ao criar empresa.");
+      console.error(err);
+    }
   };
 
   return (
@@ -54,6 +73,7 @@ const CreateCompany = () => {
           handleBlur,
           handleChange,
           handleSubmit,
+          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -71,74 +91,120 @@ const CreateCompany = () => {
                 variant="filled"
                 type="text"
                 label="Nome da Empresa"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.nomeEmpresa}
-                name="nomeEmpresa"
-                error={touched.nomeEmpresa && !!errors.nomeEmpresa}
-                helperText={touched.nomeEmpresa && errors.nomeEmpresa}
+                value={values.name}
+                error={touched.name && !!errors.name}
+                helperText={touched.name && errors.name}
                 sx={{ gridColumn: "span 4" }}
               />
+
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Cidade"
+                label="CNPJ"
+                name="cnpj"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.cidade}
-                name="cidade"
-                error={touched.cidade && !!errors.cidade}
-                helperText={touched.cidade && errors.cidade}
+                value={values.cnpj}
+                error={touched.cnpj && !!errors.cnpj}
+                helperText={touched.cnpj && errors.cnpj}
                 sx={{ gridColumn: "span 2" }}
               />
+
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label="Contato"
+                name="contact"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.contacto}
-                name="Contato"
-                error={touched.contacto && !!errors.contacto}
-                helperText={touched.contacto && errors.contacto}
+                value={values.contact}
+                error={touched.contact && !!errors.contact}
+                helperText={touched.contact && errors.contact}
                 sx={{ gridColumn: "span 2" }}
               />
+
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
+                type="email"
                 label="Email"
+                name="email"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
-                name="email"
                 error={touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 4" }}
               />
+
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label="Endereço"
+                name="address"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.endereco}
-                name="endereco"
-                error={touched.endereco && !!errors.endereco}
-                helperText={touched.endereco && errors.endereco}
+                value={values.address}
+                error={touched.address && !!errors.address}
+                helperText={touched.address && errors.address}
                 sx={{ gridColumn: "span 4" }}
               />
             </Box>
 
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="end"
-              mt="20px"
-            >
+            {/* Checklist Selection */}
+            <Box mt={4}>
+              <Typography variant="h6" color="#7ec8f2" mb={1}>
+                Selecionar Checklists
+              </Typography>
+
+              {MOCKED_CHECKLISTS.map((item) => (
+                <FormControlLabel
+                key={item.id}
+                control={
+                  <Checkbox
+                    checked={values.checklistIds.includes(item.id)}
+                    onChange={(e) => {
+                      const selected = values.checklistIds;
+                      if (e.target.checked) {
+                        setFieldValue("checklistIds", [...selected, item.id]);
+                      } else {
+                        setFieldValue(
+                          "checklistIds",
+                          selected.filter((id) => id !== item.id)
+                        );
+                      }
+                    }}
+                    sx={{
+                      color: "#aaa", // cor quando desmarcado
+                      '&.Mui-checked': {
+                        color: "#7ec8f2", // cor quando marcado
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ color: "#fff" }}>
+                    {item.name}
+                  </Typography>
+                }
+              />
+              
+              ))}
+
+              {touched.checklistIds && errors.checklistIds && (
+                <Typography color="error" fontSize={14}>
+                  {errors.checklistIds}
+                </Typography>
+              )}
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" mt={4}>
               <Button type="submit" color="secondary" variant="contained">
                 Criar Empresa
               </Button>
