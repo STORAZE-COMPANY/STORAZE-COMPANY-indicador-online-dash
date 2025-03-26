@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { tokens } from "../../theme";
+import api from "../../api/axios";
 
 const Login = () => {
   const darkTheme = createTheme({ palette: { mode: "dark" } });
@@ -20,10 +21,24 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (email && password) {
+  const handleLogin = async () => {
+    try {
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
+      console.log("response", response)
+  
+      const { access_token } = response.data;
+  
+      localStorage.setItem("token", access_token);
       localStorage.setItem("auth", "true");
+  
       navigate("/checklist");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Credenciais inválidas ou erro na API.");
     }
   };
 
