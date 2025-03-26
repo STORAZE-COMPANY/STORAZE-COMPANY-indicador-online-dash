@@ -48,6 +48,7 @@ const ChecklistForm = () => {
             options: [],
             isRequired: false,
             position: 1,
+            id: Date.now() + Math.random(), // id único
           },
         ],
       },
@@ -62,6 +63,7 @@ const ChecklistForm = () => {
       options: [],
       isRequired: false,
       position: newCategories[index].questions.length + 1,
+      id: Date.now() + Math.random(), // id único
     });
     setCategories(newCategories);
   };
@@ -83,17 +85,34 @@ const ChecklistForm = () => {
 
     if (field === "position") {
       const newPosition = parseInt(value);
-      const currentQuestions = newCategories[catIdx].questions;
-      const isDuplicate = currentQuestions.some(
-        (q, index) => index !== qIdx && q.position === newPosition
-      );
+      const questions = [...newCategories[catIdx].questions];
+      const currentQuestion = questions[qIdx];
 
-      if (isDuplicate) {
-        toast.error("Essa posição já está em uso na categoria.");
+      if (isNaN(newPosition) || newPosition <= 0) {
+        toast.error("A posição deve ser maior que zero.");
         return;
       }
 
-      newCategories[catIdx].questions[qIdx][field] = newPosition;
+      // Se posição for maior que o total, joga pro final
+      const finalPosition = Math.min(newPosition, questions.length);
+
+      // Remove a pergunta atual pelo ID
+      const filtered = questions.filter((q) => q.id !== currentQuestion.id);
+
+      // Insere na nova posição ajustada
+      filtered.splice(finalPosition - 1, 0, currentQuestion);
+
+      // Reatribui posição correta
+      const reordered = filtered.map((q, idx) => ({
+        ...q,
+        position: idx + 1,
+      }));
+
+      newCategories[catIdx].questions = reordered;
+      setCategories(newCategories);
+
+      toast.success(`Pergunta movida para a posição ${finalPosition}!`);
+      return;
     } else {
       newCategories[catIdx].questions[qIdx][field] = value;
     }
@@ -170,7 +189,7 @@ const ChecklistForm = () => {
           />
 
           {cat.questions.map((q, qIdx) => (
-            <Box key={qIdx} mb={3} p={2} bgcolor="#6E7484" borderRadius={2}>
+            <Box key={q.id} mb={3} p={2} bgcolor="#6E7484" borderRadius={2}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} md={5}>
                   <TextField
@@ -192,24 +211,30 @@ const ChecklistForm = () => {
                   />
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Posição"
-                    value={q.position}
-                    onChange={(e) =>
-                      handleChangeQuestion(
-                        catIdx,
-                        qIdx,
-                        "position",
-                        e.target.value
-                      )
-                    }
-                    sx={{
-                      backgroundColor: "#6E7484",
-                      input: { color: "#fff" },
-                    }}
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: "#fff" }}>Posição</InputLabel>
+                    <Select
+                      value={q.position}
+                      onChange={(e) =>
+                        handleChangeQuestion(
+                          catIdx,
+                          qIdx,
+                          "position",
+                          e.target.value
+                        )
+                      }
+                      sx={{ backgroundColor: "#6E7484", color: "#fff" }}
+                      label="Posição"
+                    >
+                      {Array.from({
+                        length: categories[catIdx].questions.length,
+                      }).map((_, idx) => (
+                        <MenuItem key={idx + 1} value={idx + 1}>
+                          {idx + 1}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={6} md={3}>
                   <FormControl fullWidth>
