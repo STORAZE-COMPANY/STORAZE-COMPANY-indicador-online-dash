@@ -66,11 +66,11 @@ const SideBar = () => {
                 gap="12px"
                 sx={{ transition: ".3s ease" }}
               >
-                   <img
+                {/*     <img
                   style={{ width: "35px", height: "35px", borderRadius: "8px" }}
                   src={logo}
                   alt="Argon"
-                /> 
+                />  */}
                 <Typography
                   variant="h4"
                   fontWeight="bold"
@@ -99,10 +99,10 @@ const SideBar = () => {
         >
           <Avatar
             alt="avatar"
-            src={avatar}
+            src={logo}
             sx={{ width: "100px", height: "100px" }}
           />
-          <Box sx={{ textAlign: "center" }}>
+      {/*     <Box sx={{ textAlign: "center" }}>
             <Typography variant="h3" fontWeight="bold" color={colors.gray[100]}>
               Fabio
             </Typography>
@@ -113,7 +113,7 @@ const SideBar = () => {
             >
               Admin
             </Typography>
-          </Box>
+          </Box> */}
         </Box>
       )}
 

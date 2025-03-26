@@ -6,40 +6,33 @@ import {
   IconButton,
   Tooltip,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Delete, Edit, AddCircleOutline } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-// dados mocados
-const MOCKED_CHECKLISTS = [
-  {
-    id: 1,
-    name: "Checklist de Segurança",
-    categories: [
-      {
-        categoryName: "Portões",
-        questions: [],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Checklist de Limpeza",
-    categories: [],
-  },
-];
+import api from "../../api/axios";
 
 const ChecklistList = () => {
   const [checklists, setChecklists] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const fetchChecklists = async () => {
+    try {
+      const response = await api.get("/checklists");
+      setChecklists(response.data);
+    } catch (err) {
+      toast.error("Erro ao carregar checklists.");
+      console.error("Erro ao buscar checklists:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // simula carregamento
-    setTimeout(() => {
-      setChecklists(MOCKED_CHECKLISTS);
-    }, 500);
+    fetchChecklists();
   }, []);
 
   const handleDelete = (id) => {
@@ -53,7 +46,12 @@ const ChecklistList = () => {
 
   return (
     <Box p={4} bgcolor="#141B2D" minHeight="100vh" color="#fff">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" color="#7ec8f2">
           Checklists Criados
         </Typography>
@@ -75,7 +73,11 @@ const ChecklistList = () => {
         </Button>
       </Box>
 
-      {checklists.length === 0 ? (
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress color="info" />
+        </Box>
+      ) : checklists.length === 0 ? (
         <Typography variant="body1">Nenhum checklist encontrado.</Typography>
       ) : (
         checklists.map((checklist) => (

@@ -18,7 +18,7 @@ const Login = () => {
   const theme = useTheme();
   const colors = tokens("dark");
   const navigate = useNavigate();
-  const {login} = useAuth(); 
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,10 +29,9 @@ const Login = () => {
 
       const { access_token } = response.data;
 
+      login(access_token);
 
-     login(access_token);
-
-    navigate("/checklists"); 
+      navigate("/checklists");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert("Credenciais inválidas ou erro na API.");
