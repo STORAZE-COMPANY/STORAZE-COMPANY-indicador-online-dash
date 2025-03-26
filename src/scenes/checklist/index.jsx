@@ -18,6 +18,7 @@ import {
 import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import api from "../../api/axios";
 
 const ChecklistForm = () => {
   const [checklistName, setChecklistName] = useState("");
@@ -120,8 +121,46 @@ const ChecklistForm = () => {
     setCategories(newCategories);
   };
 
-  const handleSubmit = () => {
-    console.log({ checklistName, categories });
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        name: checklistName,
+        categories: categories.map((cat) => ({
+          categoryName: cat.categoryName,
+          questions: cat.questions.map((q, idx) => ({
+            questionText: q.questionText,
+            questionType: q.questionType,
+            options: q.questionType === "Múltipla escolha" ? q.options : [],
+            isRequired: q.isRequired,
+            position: idx + 1,
+          })),
+        })),
+      };
+
+      console.log("payload", payload)
+
+      await api.post("/checklists", payload);
+      toast.success("Checklist publicado com sucesso!");
+      
+      setChecklistName("");
+      setCategories([
+        {
+          categoryName: "",
+          questions: [
+            {
+              questionText: "",
+              questionType: "Texto",
+              options: [],
+              isRequired: true,
+              position: 1,
+            },
+          ],
+        },
+      ]); 
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao publicar o checklist!");
+    }
   };
 
   return (
