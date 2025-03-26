@@ -18,11 +18,13 @@ import {
 import Checklist from "./scenes/checklist";
 import Company from "./scenes/company";
 import CreateCompany from "./scenes/company/create-company";
+import Login from "./scenes/login";
 
 const AppRouter = () => {
   return (
     <Router>
       <Routes>
+          <Route path="/login" element={<Login />} />
         <Route path="/" element={<App />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/team" element={<Team />} />
