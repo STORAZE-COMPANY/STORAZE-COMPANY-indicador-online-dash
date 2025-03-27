@@ -12,6 +12,7 @@ import { useState } from "react";
 import { tokens } from "../../theme";
 import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
   const darkTheme = createTheme({ palette: { mode: "dark" } });
@@ -33,8 +34,7 @@ const Login = () => {
 
       navigate("/checklists");
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      alert("Credenciais inválidas ou erro na API.");
+      toast.error("Credenciais inválidas");
     }
   };
 
@@ -95,6 +95,7 @@ const Login = () => {
           </Button>
         </Box>
       </Box>
+      <ToastContainer />
     </ThemeProvider>
   );
 };

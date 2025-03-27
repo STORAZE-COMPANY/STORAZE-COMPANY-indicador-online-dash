@@ -25,7 +25,6 @@ const ChecklistList = () => {
       setChecklists(response.data);
     } catch (err) {
       toast.error("Erro ao carregar checklists.");
-      console.error("Erro ao buscar checklists:", err);
     } finally {
       setLoading(false);
     }
