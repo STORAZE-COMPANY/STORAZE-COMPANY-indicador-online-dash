@@ -87,13 +87,24 @@ export interface CreateEmployeeDto {
   name: string;
   /** Email do funcionário */
   email: string;
-  /** Senha do funcionário (mínimo de 4 caracteres) */
-  password: string;
+  /** Telefone do funcionário */
+  phone: string;
   /** ID da empresa do funcionário */
-  companyId: number;
+  company_id: number;
 }
 
-export interface UpdateEmployeeDto { [key: string]: unknown }
+export interface CreateEmployeeResponse {
+  /** Id do funcionário */
+  id: number;
+  /** Nome do funcionário */
+  name: string;
+  /** Email do funcionário */
+  email: string;
+  /** ID da empresa do funcionário */
+  company_id: number;
+  /** Telefone do funcionário */
+  phone: string;
+}
 
 /**
  * Tipo da pergunta

@@ -18,6 +18,7 @@ import {
 import type {
   Checklist,
   Company,
+  CreateEmployeeResponse,
   ResponseAuthDto,
   User
 } from './api.schemas';
@@ -38,6 +39,8 @@ export const getCompaniesControllerCreateResponseMock = (overrideResponse: Parti
 export const getCompaniesControllerFindOneResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), ...overrideResponse})
 
 export const getCompaniesControllerUpdateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), ...overrideResponse})
+
+export const getEmployeesControllerCreateResponseMock = (overrideResponse: Partial< CreateEmployeeResponse > = {}): CreateEmployeeResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), phone: faker.string.alpha(20), ...overrideResponse})
 
 export const getChecklistsControllerCreateResponseMock = (overrideResponse: Partial< Checklist > = {}): Checklist => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), categories: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({categoryName: faker.string.alpha(20), questions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({questionText: faker.string.alpha(20), questionType: faker.helpers.arrayElement(['multiple-choice','text','boolean'] as const), options: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.string.alpha(20))), undefined]), isRequired: faker.datatype.boolean(), position: faker.number.int({min: undefined, max: undefined})}))})), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), ...overrideResponse})
 
@@ -164,52 +167,14 @@ export const getCompaniesControllerRemoveMockHandler = (overrideResponse?: void 
   })
 }
 
-export const getEmployeesControllerFindAllMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
-  return http.get('*/employees', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 200,
-        
-      })
-  })
-}
-
-export const getEmployeesControllerCreateMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+export const getEmployeesControllerCreateMockHandler = (overrideResponse?: CreateEmployeeResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CreateEmployeeResponse> | CreateEmployeeResponse)) => {
   return http.post('*/employees', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getEmployeesControllerCreateResponseMock()),
       { status: 201,
-        
-      })
-  })
-}
-
-export const getEmployeesControllerFindOneMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
-  return http.get('*/employees/:id', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 200,
-        
-      })
-  })
-}
-
-export const getEmployeesControllerUpdateMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)) => {
-  return http.put('*/employees/:id', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 200,
-        
-      })
-  })
-}
-
-export const getEmployeesControllerRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void)) => {
-  return http.delete('*/employees/:id', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 200,
-        
+        headers: { 'Content-Type': 'application/json' }
       })
   })
 }
@@ -282,11 +247,7 @@ export const getIndicadorOnlineAPIMock = () => [
   getCompaniesControllerFindOneMockHandler(),
   getCompaniesControllerUpdateMockHandler(),
   getCompaniesControllerRemoveMockHandler(),
-  getEmployeesControllerFindAllMockHandler(),
   getEmployeesControllerCreateMockHandler(),
-  getEmployeesControllerFindOneMockHandler(),
-  getEmployeesControllerUpdateMockHandler(),
-  getEmployeesControllerRemoveMockHandler(),
   getChecklistsControllerCreateMockHandler(),
   getChecklistsControllerFindAllMockHandler(),
   getChecklistsControllerFindOneMockHandler(),

@@ -11,11 +11,11 @@ import type {
   CreateChecklistDto,
   CreateCompanyDto,
   CreateEmployeeDto,
+  CreateEmployeeResponse,
   LoginDto,
   ResponseAuthDto,
   UpdateChecklistDto,
   UpdateCompanyDto,
-  UpdateEmployeeDto,
   User
 } from './api.schemas';
 
@@ -125,52 +125,13 @@ const companiesControllerRemove = (
       options);
     }
   
-const employeesControllerFindAll = (
-    
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
-      {url: `http://localhost:3000/employees`, method: 'GET'
-    },
-      options);
-    }
-  
 const employeesControllerCreate = (
     createEmployeeDto: CreateEmployeeDto,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
+      return customInstance<CreateEmployeeResponse>(
       {url: `http://localhost:3000/employees`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createEmployeeDto
-    },
-      options);
-    }
-  
-const employeesControllerFindOne = (
-    id: number,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
-      {url: `http://localhost:3000/employees/${id}`, method: 'GET'
-    },
-      options);
-    }
-  
-const employeesControllerUpdate = (
-    id: number,
-    updateEmployeeDto: UpdateEmployeeDto,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
-      {url: `http://localhost:3000/employees/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateEmployeeDto
-    },
-      options);
-    }
-  
-const employeesControllerRemove = (
-    id: number,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
-      {url: `http://localhost:3000/employees/${id}`, method: 'DELETE'
     },
       options);
     }
@@ -225,7 +186,7 @@ const checklistsControllerRemove = (
       options);
     }
   
-return {appControllerGetHello,authControllerLogin,usersControllerCreate,usersControllerGetAllUsers,usersControllerGetByEmail,companiesControllerFindAll,companiesControllerCreate,companiesControllerFindOne,companiesControllerUpdate,companiesControllerRemove,employeesControllerFindAll,employeesControllerCreate,employeesControllerFindOne,employeesControllerUpdate,employeesControllerRemove,checklistsControllerCreate,checklistsControllerFindAll,checklistsControllerFindOne,checklistsControllerUpdate,checklistsControllerRemove}};
+return {appControllerGetHello,authControllerLogin,usersControllerCreate,usersControllerGetAllUsers,usersControllerGetByEmail,companiesControllerFindAll,companiesControllerCreate,companiesControllerFindOne,companiesControllerUpdate,companiesControllerRemove,employeesControllerCreate,checklistsControllerCreate,checklistsControllerFindAll,checklistsControllerFindOne,checklistsControllerUpdate,checklistsControllerRemove}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -241,11 +202,7 @@ export type CompaniesControllerCreateResult = NonNullable<Awaited<ReturnType<Ret
 export type CompaniesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindOne']>>>
 export type CompaniesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerUpdate']>>>
 export type CompaniesControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerRemove']>>>
-export type EmployeesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerFindAll']>>>
 export type EmployeesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerCreate']>>>
-export type EmployeesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerFindOne']>>>
-export type EmployeesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerUpdate']>>>
-export type EmployeesControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerRemove']>>>
 export type ChecklistsControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerCreate']>>>
 export type ChecklistsControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindAll']>>>
 export type ChecklistsControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindOne']>>>
