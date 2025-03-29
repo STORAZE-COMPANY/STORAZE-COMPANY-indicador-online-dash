@@ -1,4 +1,5 @@
-import { Box, Button, TextField, useMediaQuery, InputLabel } from "@mui/material";
+import { Box, Button, useMediaQuery, } from "@mui/material";
+
 import { Header } from "../../components";
 import { Formik } from "formik";
 import React, { useState, useEffect } from 'react';
@@ -79,7 +80,7 @@ export function CreateEmployee() {
               justifyContent="end"
               mt="20px"
             >
-              <Button disabled={isSubmitting || !isValid} onClick={handleSubmit} color="secondary" variant="contained">
+              <Button loading={isSubmitting} disabled={isSubmitting || !isValid} onClick={handleSubmit} color="secondary" variant="contained">
                 Criar
               </Button>
             </Box>
