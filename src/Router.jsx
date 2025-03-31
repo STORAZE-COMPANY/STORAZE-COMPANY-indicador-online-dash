@@ -6,7 +6,7 @@ import {
   Team,
   Invoices,
   Contacts,
-  Form,
+  CreateEmployee,
   Bar,
   Line,
   Pie,
@@ -48,7 +48,7 @@ const AppRouter = () => {
 
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/invoices" element={<Invoices />} />
-          <Route path="/form" element={<Form />} />
+          <Route path="/createEmployee" element={<CreateEmployee />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/bar" element={<Bar />} />
           <Route path="/pie" element={<Pie />} />

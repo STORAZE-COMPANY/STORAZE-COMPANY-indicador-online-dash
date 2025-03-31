@@ -175,7 +175,7 @@ const SideBar = () => {
 
           <Item
             title="Criar usuário"
-            path="/form"
+            path="/createEmployee"
             colors={colors}
             icon={<PersonOutlined />}
           />

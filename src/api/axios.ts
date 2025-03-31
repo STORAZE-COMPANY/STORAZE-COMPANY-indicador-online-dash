@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const api = axios.create({
+ const api = axios.create({
   baseURL: "http://localhost:3000", 
 });
 export const customInstance = async <T>(
