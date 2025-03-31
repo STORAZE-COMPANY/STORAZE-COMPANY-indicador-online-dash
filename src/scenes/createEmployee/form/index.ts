@@ -4,9 +4,10 @@ import { ValidationMessages } from "../../../shared/enums/messages/validationsMe
 import { ResponseMessages } from "../../../shared/enums/messages/responseMessages";
 
 import { createEmployee } from "../requests";
+import { useState } from "react";
 
 export function useCreateEmployeeForm(){
-
+const [formLoading, setFormLoading] = useState(false);
 const initialValues: yup.InferType<typeof checkoutSchema> = { name: "", email: "", contact: "", company_id: 0 };
 
   const checkoutSchema = yup.object().shape({
@@ -35,17 +36,21 @@ const initialValues: yup.InferType<typeof checkoutSchema> = { name: "", email: "
   
     },   
     onError,
-    onSuccess
-  )
+ (responseMessages: ResponseMessages ) =>{
+    onSuccess(responseMessages);
     actions.resetForm({
-      values: initialValues,
+      values: initialValues 
     });
+ },
+ (loading) => setFormLoading(loading)
+  )
+
   };
   
   return {
     initialValues,
     checkoutSchema,
     handleFormSubmit,
-   
+    formLoading
   };
 }

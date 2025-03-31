@@ -5,21 +5,21 @@ import { Formik } from "formik";
 import React, { useState, useEffect } from 'react';
 import { getCompanies } from "./requests";
 import { useCreateEmployeeForm } from "./form";
-import { PhoneInput } from "./phoneInput/phoneInput";
 import { toast, ToastContainer } from "react-toastify";
 import { SelectCompanySection } from "./select_company_section";
 import { InputsSection } from "./inputsSection";
+
 export function CreateEmployee() {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [companies, setCompanies] = useState([]);
-  const [companyId, setCompanyId] = useState('');
 
-  const { initialValues, checkoutSchema, handleFormSubmit } = useCreateEmployeeForm();
+
+  const { initialValues, checkoutSchema, handleFormSubmit, formLoading } = useCreateEmployeeForm();
 
   function handleSubmit(values, actions) {
     handleFormSubmit(values, actions,
       (responseMessages) => toast.error(responseMessages),
-      (responseMessages) => toast.success(responseMessages)).then(() => setCompanyId(''))
+      (responseMessages) => toast.success(responseMessages))
   }
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export function CreateEmployee() {
         onSubmit={(values, actions) => handleSubmit(values, actions)}
         initialValues={initialValues}
         validationSchema={checkoutSchema}
+
       >
         {({
           values,
@@ -67,10 +68,9 @@ export function CreateEmployee() {
               />
               <SelectCompanySection
                 companies={companies}
-                companyId={companyId}
+                companyId={values.company_id}
                 onChange={(event) => {
-                  setCompanyId(event.target.value),
-                    setFieldValue("company_id", Number(event.target.value))
+                  setFieldValue("company_id", Number(event.target.value))
                 }}
               />
             </Box>
@@ -80,7 +80,7 @@ export function CreateEmployee() {
               justifyContent="end"
               mt="20px"
             >
-              <Button loading={isSubmitting} disabled={isSubmitting || !isValid} onClick={handleSubmit} color="secondary" variant="contained">
+              <Button loading={formLoading} disabled={formLoading || !isValid} onClick={handleSubmit} color="secondary" variant="contained">
                 Criar
               </Button>
             </Box>

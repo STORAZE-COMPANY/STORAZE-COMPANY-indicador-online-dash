@@ -7,8 +7,13 @@ import { ResponseMessages } from "../../../shared/enums/messages/responseMessage
 const {employeesControllerCreate,companiesControllerFindAll} = getIndicadorOnlineAPI();
 
 
-export const createEmployee = async (employee: CreateEmployeeDto,onError:(responseMessages:ResponseMessages)=>void,onSuccess:(responseMessages:ResponseMessages)=>void,) => {
-
+export const createEmployee = async (
+  employee: CreateEmployeeDto,
+  onError:(responseMessages:ResponseMessages)=>void,
+  onSuccess:(responseMessages:ResponseMessages)=>void,
+  loading:(boolean:boolean)=>void
+) => {
+  loading(true);
   try {
     const response = await employeesControllerCreate(employee);
   if(response){
@@ -25,6 +30,8 @@ export const createEmployee = async (employee: CreateEmployeeDto,onError:(respon
     console.error("Error creating employee", error);
     onError(ResponseMessages.createError);
     throw error;
+  }finally{
+    loading(false);
   }
 };
 
