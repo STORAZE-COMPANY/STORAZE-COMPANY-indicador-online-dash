@@ -13,8 +13,12 @@ import {
   Divider,
   Grid,
   Radio,
+  Checkbox,
+  FormControlLabel,
   Paper,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+
 import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,6 +36,8 @@ const ChecklistForm = () => {
           options: [],
           isRequired: true,
           position: 1,
+          promptIA: "",
+          id: Date.now() + Math.random(),
         },
       ],
     },
@@ -49,7 +55,8 @@ const ChecklistForm = () => {
             options: [],
             isRequired: false,
             position: 1,
-            id: Date.now() + Math.random(), // id único
+            promptIA: "",
+            id: Date.now() + Math.random(),
           },
         ],
       },
@@ -64,20 +71,30 @@ const ChecklistForm = () => {
       options: [],
       isRequired: false,
       position: newCategories[index].questions.length + 1,
-      id: Date.now() + Math.random(), // id único
+      promptIA: "",
+      id: Date.now() + Math.random(),
     });
     setCategories(newCategories);
   };
 
   const handleAddOption = (catIdx, qIdx) => {
     const newCategories = [...categories];
-    newCategories[catIdx].questions[qIdx].options.push("");
+    newCategories[catIdx].questions[qIdx].options.push({
+      value: "",
+      isAnomaly: false,
+    });
     setCategories(newCategories);
   };
 
   const handleDeleteOption = (catIdx, qIdx, optIdx) => {
     const newCategories = [...categories];
     newCategories[catIdx].questions[qIdx].options.splice(optIdx, 1);
+    setCategories(newCategories);
+  };
+
+  const handleOptionAnomalyChange = (catIdx, qIdx, optIdx, value) => {
+    const newCategories = [...categories];
+    newCategories[catIdx].questions[qIdx].options[optIdx].isAnomaly = value;
     setCategories(newCategories);
   };
 
@@ -94,24 +111,13 @@ const ChecklistForm = () => {
         return;
       }
 
-      // Se posição for maior que o total, joga pro final
       const finalPosition = Math.min(newPosition, questions.length);
-
-      // Remove a pergunta atual pelo ID
       const filtered = questions.filter((q) => q.id !== currentQuestion.id);
-
-      // Insere na nova posição ajustada
       filtered.splice(finalPosition - 1, 0, currentQuestion);
-
-      // Reatribui posição correta
-      const reordered = filtered.map((q, idx) => ({
-        ...q,
-        position: idx + 1,
-      }));
+      const reordered = filtered.map((q, idx) => ({ ...q, position: idx + 1 }));
 
       newCategories[catIdx].questions = reordered;
       setCategories(newCategories);
-
       toast.success(`Pergunta movida para a posição ${finalPosition}!`);
       return;
     } else {
@@ -130,18 +136,23 @@ const ChecklistForm = () => {
           questions: cat.questions.map((q, idx) => ({
             questionText: q.questionText,
             questionType: q.questionType,
-            options: q.questionType === "Múltipla escolha" ? q.options : [],
+            options:
+              q.questionType === "Múltipla escolha"
+                ? q.options.map((opt) => ({
+                    value: opt.value,
+                    isAnomaly: opt.isAnomaly,
+                  }))
+                : [],
             isRequired: q.isRequired,
             position: idx + 1,
+            promptIA: q.promptIA,
           })),
         })),
       };
 
-      console.log("payload", payload)
-
       await api.post("/checklists", payload);
       toast.success("Checklist publicado com sucesso!");
-      
+
       setChecklistName("");
       setCategories([
         {
@@ -153,10 +164,12 @@ const ChecklistForm = () => {
               options: [],
               isRequired: true,
               position: 1,
+              promptIA: "",
+              id: Date.now() + Math.random(),
             },
           ],
         },
-      ]); 
+      ]);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao publicar o checklist!");
@@ -169,7 +182,7 @@ const ChecklistForm = () => {
         elevation={3}
         sx={{ backgroundColor: "#434957", p: 3, borderRadius: 3, mb: 4 }}
       >
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h6" gutterBottom>
           Criar Checklist
         </Typography>
         <Divider sx={{ borderColor: "#7ec8f2", mb: 2 }} />
@@ -203,11 +216,10 @@ const ChecklistForm = () => {
               position: "absolute",
               top: -16,
               left: 16,
-              backgroundColor: "#7ec8f2",
+              backgroundColor: "#23B3E8",
               px: 2,
               py: 0.5,
-              borderTopLeftRadius: 12,
-              borderTopRightRadius: 12,
+              borderRadius: "10px 10px 0 0",
               fontWeight: "bold",
               color: "white",
             }}
@@ -246,6 +258,7 @@ const ChecklistForm = () => {
                     sx={{
                       backgroundColor: "#6E7484",
                       input: { color: "#fff" },
+                      width: "800px",
                     }}
                   />
                 </Grid>
@@ -263,7 +276,6 @@ const ChecklistForm = () => {
                         )
                       }
                       sx={{ backgroundColor: "#6E7484", color: "#fff" }}
-                      label="Posição"
                     >
                       {Array.from({
                         length: categories[catIdx].questions.length,
@@ -276,7 +288,7 @@ const ChecklistForm = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={6} md={3}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth sx={{ width: "300px" }}>
                     <InputLabel sx={{ color: "#fff" }}>
                       Tipo de Pergunta
                     </InputLabel>
@@ -327,18 +339,18 @@ const ChecklistForm = () => {
                       key={optIdx}
                       display="flex"
                       alignItems="center"
-                      gap={1}
+                      justifyContent="space-between"
                       mb={1}
                     >
                       <Radio disabled />
                       <TextField
-                        value={opt}
+                        value={opt.value}
                         placeholder={`Opção ${optIdx + 1}`}
                         onChange={(e) => {
                           const newCategories = [...categories];
                           newCategories[catIdx].questions[qIdx].options[
                             optIdx
-                          ] = e.target.value;
+                          ].value = e.target.value;
                           setCategories(newCategories);
                         }}
                         sx={{
@@ -349,95 +361,160 @@ const ChecklistForm = () => {
                       />
                       <IconButton
                         onClick={() => handleDeleteOption(catIdx, qIdx, optIdx)}
+                        sx={{ left: -80 }}
                       >
                         <CloseOutlined sx={{ color: "white" }} />
                       </IconButton>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={opt.isAnomaly}
+                            onChange={(e) =>
+                              handleOptionAnomalyChange(
+                                catIdx,
+                                qIdx,
+                                optIdx,
+                                e.target.checked
+                              )
+                            }
+                          />
+                        }
+                        label="Marcar como anomalia"
+                        sx={{ color: "white" }}
+                      />
                     </Box>
                   ))}
-                  <Box display="flex" justifyContent="space-between" mt={3}>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      startIcon={<AddCircleOutline />}
-                      onClick={() => handleAddOption(catIdx, qIdx)}
-                      sx={{ color: "white" }}
+                  <Divider sx={{ my: 2, backgroundColor: "#7ec8f2" }} />
+
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: "#fff",
+                      mb: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <MenuIcon fontSize="small" />
+                    Tipo de Resposta
+                  </Typography>
+                  <FormControl fullWidth>
+                    <Select
+                      value={q.questionType}
+                      onChange={(e) =>
+                        handleChangeQuestion(
+                          catIdx,
+                          qIdx,
+                          "questionType",
+                          e.target.value
+                        )
+                      }
+                      sx={{ backgroundColor: "#3b4050", color: "#fff" }}
                     >
-                      Adicionar opção
-                    </Button>
-                    <Box display="flex" justifyContent="flex-end" mt={2}>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        startIcon={<Delete />}
-                        onClick={() => {
-                          const newCategories = [...categories];
-                          newCategories[catIdx].questions.splice(qIdx, 1);
-                          setCategories(newCategories);
-                        }}
-                      >
-                        Excluir pergunta
-                      </Button>
-                    </Box>
-                  </Box>
+                      <MenuItem value="Múltipla escolha">
+                        Múltipla escolha
+                      </MenuItem>
+                      <MenuItem value="Texto">Texto</MenuItem>
+                      <MenuItem value="Upload de arquivo">
+                        Upload de arquivo
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<AddCircleOutline />}
+                    onClick={() => handleAddOption(catIdx, qIdx)}
+                    sx={{ color: "white", mt: 2 }}
+                  >
+                    Adicionar opção
+                  </Button>
                 </Box>
               )}
 
-              {q.questionType === "Texto" && (
+              {(q.questionType === "Texto" ||
+                q.questionType === "Upload de arquivo") && (
                 <Box mt={2}>
                   <TextField
                     fullWidth
-                    disabled
-                    value="Resposta em texto"
+                    placeholder="Digite o prompt que a IA utilizará para definir o que será uma anomalia"
+                    value={q.promptIA || ""}
+                    onChange={(e) =>
+                      handleChangeQuestion(
+                        catIdx,
+                        qIdx,
+                        "promptIA",
+                        e.target.value
+                      )
+                    }
                     sx={{
-                      backgroundColor: "#6E7484",
+                      backgroundColor: "#6E7484 ",
                       input: { color: "#fff" },
                     }}
                   />
 
-                  <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      startIcon={<Delete />}
-                      onClick={() => {
-                        const newCategories = [...categories];
-                        newCategories[catIdx].questions.splice(qIdx, 1);
-                        setCategories(newCategories);
-                      }}
+                  
+                  {q.questionType === "Texto" && (
+                    <>
+                    <Divider sx={{ my: 2, backgroundColor: "#7ec8f2" }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: "#fff",
+                      mb: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <MenuIcon fontSize="small" />
+                    Tipo de Resposta
+                  </Typography>
+                  <FormControl fullWidth>
+                    <Select
+                      value={q.questionType}
+                      onChange={(e) =>
+                        handleChangeQuestion(
+                          catIdx,
+                          qIdx,
+                          "questionType",
+                          e.target.value
+                        )
+                      }
+                      sx={{ backgroundColor: "#3b4050", color: "#fff" }}
                     >
-                      Excluir pergunta
-                    </Button>
-                  </Box>
+                      <MenuItem value="Múltipla escolha">
+                        Múltipla escolha
+                      </MenuItem>
+                      <MenuItem value="Texto">Texto</MenuItem>
+                      <MenuItem value="Upload de arquivo">
+                        Upload de arquivo
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                    </>
+                  )}
+
+                  
                 </Box>
               )}
 
-              {q.questionType === "Upload de arquivo" && (
-                <Box mt={2}>
-                  <TextField
-                    fullWidth
-                    disabled
-                    value="Upload de arquivo habilitado"
-                    sx={{
-                      backgroundColor: "#3b4050",
-                      input: { color: "#fff" },
-                    }}
-                  />
-                  <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      startIcon={<Delete />}
-                      onClick={() => {
-                        const newCategories = [...categories];
-                        newCategories[catIdx].questions.splice(qIdx, 1);
-                        setCategories(newCategories);
-                      }}
-                    >
-                      Excluir pergunta
-                    </Button>
-                  </Box>
-                </Box>
-              )}
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<Delete />}
+                  onClick={() => {
+                    const newCategories = [...categories];
+                    newCategories[catIdx].questions.splice(qIdx, 1);
+                    setCategories(newCategories);
+                  }}
+                >
+                  Excluir pergunta
+                </Button>
+              </Box>
             </Box>
           ))}
 
@@ -452,7 +529,6 @@ const ChecklistForm = () => {
             >
               Adicionar pergunta
             </Button>
-
             <Button
               variant="contained"
               color="error"
@@ -489,9 +565,7 @@ const ChecklistForm = () => {
           fontWeight: "bold",
           fontSize: 14,
           backgroundColor: "#7ec8f2",
-          "&:hover": {
-            backgroundColor: "#1499e6",
-          },
+          "&:hover": { backgroundColor: "#1499e6" },
         }}
       >
         Publicar checklist

@@ -22,6 +22,7 @@ import Login from "./scenes/login";
 import ChecklistForm from "./scenes/checklist/create-checklist";
 import ChecklistList from "./scenes/checklist";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
+import FormResponses from "./scenes/formResponse/index.jsx";
 
 const AppRouter = () => {
   return (
@@ -44,6 +45,7 @@ const AppRouter = () => {
           <Route path="/company" element={<Company />} />
 
           <Route path="/checklists" element={<ChecklistList />} />
+          <Route path="/formresponse" element={<FormResponses />} />
           <Route path="/checklistform" element={<ChecklistForm />} />
 
           <Route path="/contacts" element={<Contacts />} />

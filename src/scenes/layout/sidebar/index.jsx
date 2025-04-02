@@ -19,6 +19,7 @@ import {
   TimelineOutlined,
   WavesOutlined,
 } from "@mui/icons-material";
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import avatar from "../../../assets/images/fabio-vivas.jpeg";
 import logo from "../../../assets/images/logo-cliente.jpeg";
 import Item from "./Item";
@@ -102,7 +103,7 @@ const SideBar = () => {
             src={logo}
             sx={{ width: "100px", height: "100px" }}
           />
-      {/*     <Box sx={{ textAlign: "center" }}>
+          {/*     <Box sx={{ textAlign: "center" }}>
             <Typography variant="h3" fontWeight="bold" color={colors.gray[100]}>
               Fabio
             </Typography>
@@ -165,6 +166,12 @@ const SideBar = () => {
             path="/company"
             colors={colors}
             icon={<ApartmentOutlined />}
+          />
+          <Item
+            title="Gerenciar Checklist"
+            path="/formresponse"
+            colors={colors}
+            icon={<ManageSearchOutlinedIcon />}
           />
           <Item
             title="Gerenciar equipe"
