@@ -13,16 +13,21 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/axios";
+import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const ChecklistList = () => {
   const [checklists, setChecklists] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const { checklistsControllerFindAll } = getIndicadorOnlineAPI();
+
+
   const fetchChecklists = async () => {
     try {
-      const response = await api.get("/checklists");
-      setChecklists(response.data);
+      const data = await checklistsControllerFindAll(); 
+      console.log("data", data)
+      setChecklists(data);
     } catch (err) {
       toast.error("Erro ao carregar checklists.");
     } finally {

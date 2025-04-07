@@ -10,8 +10,9 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(checkAuth());
 
-  const login = (token) => {
-    storeToken(token);
+  const login = ({ access_token, refresh_token }) => {
+
+    storeToken({ access_token, refresh_token });
     setAuth(true);
   };
 

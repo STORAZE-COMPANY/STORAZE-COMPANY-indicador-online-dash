@@ -23,9 +23,14 @@ import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "../../api/axios";
+import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const ChecklistForm = () => {
+  const { checklistsControllerCreate } = getIndicadorOnlineAPI();
+
   const [checklistName, setChecklistName] = useState("");
+  const [expiriesIn, setExpiriesIn] = useState("");
+
   const [categories, setCategories] = useState([
     {
       categoryName: "",
@@ -82,9 +87,18 @@ const ChecklistForm = () => {
     newCategories[catIdx].questions[qIdx].options.push({
       value: "",
       isAnomaly: false,
+      anomalyLevel: "",
+
     });
     setCategories(newCategories);
   };
+
+  const handleAnomalyLevelChange = (catIdx, qIdx, optIdx, level) => {
+    const newCategories = [...categories];
+    newCategories[catIdx].questions[qIdx].options[optIdx].anomalyLevel = level;
+    setCategories(newCategories);
+  };
+  
 
   const handleDeleteOption = (catIdx, qIdx, optIdx) => {
     const newCategories = [...categories];
@@ -131,29 +145,33 @@ const ChecklistForm = () => {
     try {
       const payload = {
         name: checklistName,
-        categories: categories.map((cat) => ({
-          categoryName: cat.categoryName,
-          questions: cat.questions.map((q, idx) => ({
-            questionText: q.questionText,
-            questionType: q.questionType,
-            options:
+        expiries_in: "2025-04-05T23:42:31.123Z",
+        checkListItem: categories.map((cat) => ({
+          categoriesId: "3d4d1bb8-fc8f-43a3-9a3b-9e69eb11e03b", 
+          question_list: cat.questions.map((q) => ({
+            question: q.questionText,
+            type: q.questionType,
+            isRequired: q.isRequired,
+            answerType: "Text", 
+            iaPrompt: q.promptIA || undefined,
+            multiple_choice:
               q.questionType === "Múltipla escolha"
                 ? q.options.map((opt) => ({
-                    value: opt.value,
-                    isAnomaly: opt.isAnomaly,
+                    choice: opt.value,
+                    anomaly: opt.isAnomaly
+                      ? opt.anomalyLevel || "LOW"
+                      : undefined,
                   }))
                 : [],
-            isRequired: q.isRequired,
-            position: idx + 1,
-            promptIA: q.promptIA,
           })),
         })),
       };
-
-      await api.post("/checklists", payload);
+  
+      await checklistsControllerCreate(payload);
       toast.success("Checklist publicado com sucesso!");
-
+  
       setChecklistName("");
+      setExpiriesIn("");
       setCategories([
         {
           categoryName: "",
@@ -175,6 +193,8 @@ const ChecklistForm = () => {
       toast.error("Erro ao publicar o checklist!");
     }
   };
+  
+  
 
   return (
     <Box p={4} bgcolor="#141B2D" color="#fff">
@@ -382,6 +402,46 @@ const ChecklistForm = () => {
                         label="Marcar como anomalia"
                         sx={{ color: "white" }}
                       />
+                      {opt.isAnomaly && (
+  <Box display="flex" gap={2} ml={4}>
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={opt.anomalyLevel === "HIGH"}
+          onChange={(e) =>
+            handleAnomalyLevelChange(
+              catIdx,
+              qIdx,
+              optIdx,
+              e.target.checked ? "HIGH" : ""
+            )
+          }
+        />
+      }
+      label="Restritiva"
+      sx={{ color: "white" }}
+    />
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={opt.anomalyLevel === "MEDIUM"}
+          onChange={(e) =>
+            handleAnomalyLevelChange(
+              catIdx,
+              qIdx,
+              optIdx,
+              e.target.checked ? "MEDIUM" : ""
+            )
+          }
+          disabled={opt.anomalyLevel === "HIGH"}
+        />
+      }
+      label="Não Restritiva"
+      sx={{ color: "white" }}
+    />
+  </Box>
+)}
+
                     </Box>
                   ))}
                   <Divider sx={{ my: 2, backgroundColor: "#7ec8f2" }} />

@@ -13,6 +13,7 @@ import { tokens } from "../../theme";
 import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
+import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const Login = () => {
   const darkTheme = createTheme({ palette: { mode: "dark" } });
@@ -24,19 +25,25 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const {authControllerLoginDashboard} = getIndicadorOnlineAPI()
+
+
   const handleLogin = async () => {
     try {
-      const response = await api.post("/auth/login", { email, password });
-
-      const { access_token } = response.data;
-
-      login(access_token);
-
+      const { access_token, refresh_token } = await authControllerLoginDashboard({
+        email,
+        password,
+      });
+  
+      login({ access_token, refresh_token });
+  
       navigate("/checklists");
     } catch (error) {
+      console.log("error", error)
       toast.error("Credenciais inválidas");
     }
   };
+  
 
   return (
     <ThemeProvider theme={darkTheme}>
