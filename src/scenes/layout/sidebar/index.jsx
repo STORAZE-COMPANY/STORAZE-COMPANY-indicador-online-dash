@@ -19,10 +19,12 @@ import {
   TimelineOutlined,
   WavesOutlined,
 } from "@mui/icons-material";
-import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
+import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined";
 import avatar from "../../../assets/images/fabio-vivas.jpeg";
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import logo from "../../../assets/images/logo-cliente.jpeg";
 import Item from "./Item";
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { ToggledContext } from "../../../App";
 
 const SideBar = () => {
@@ -156,7 +158,13 @@ const SideBar = () => {
           }}
         >
           <Item
-            title="CheckList"
+            title="Gerenciar Categorias"
+            path="/category"
+            colors={colors}
+            icon={<CheckOutlinedIcon />}
+          />
+          <Item
+            title="Gerenciar CheckList"
             path="/checklists"
             colors={colors}
             icon={<ChecklistOutlined />}
@@ -166,6 +174,12 @@ const SideBar = () => {
             path="/company"
             colors={colors}
             icon={<ApartmentOutlined />}
+          />
+          <Item
+            title="Gerenciar funcionários"
+            path="/employees"
+            colors={colors}
+            icon={<BadgeOutlinedIcon />}
           />
           <Item
             title="Gerenciar Checklist"

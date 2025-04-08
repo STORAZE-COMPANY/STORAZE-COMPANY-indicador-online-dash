@@ -18,13 +18,14 @@ import {
 import type {
   Categories,
   CheckList,
-  Checklist,
+  CheckListForSpecificEmployee,
+  CheckListItemFormattedList,
   Company,
   CreateEmployeeResponse,
   Employee,
+  QuestionsWithChoices,
   ResponseAuthDto,
   Roles,
-  User,
   UserAuth
 } from './api.schemas';
 
@@ -37,37 +38,31 @@ export const getAuthControllerRefreshTokenResponseMock = (overrideResponse: Part
 
 export const getAuthControllerGetUserAuthResponseMock = (overrideResponse: Partial< UserAuth > = {}): UserAuth => ({id: faker.string.alpha(20), name: faker.string.alpha(20), email: faker.string.alpha(20), role: faker.string.alpha(20), ...overrideResponse})
 
-export const getUsersControllerCreateResponseMock = (overrideResponse: Partial< User > = {}): User => ({id: faker.string.alpha(20), email: faker.string.alpha(20), password: faker.string.alpha(20), name: faker.string.alpha(20), role: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
+export const getCompaniesControllerFindAllResponseMock = (): Company[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20)})))
 
-export const getUsersControllerGetAllUsersResponseMock = (): User[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), email: faker.string.alpha(20), password: faker.string.alpha(20), name: faker.string.alpha(20), role: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`})))
+export const getCompaniesControllerCreateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
 
-export const getUsersControllerGetByEmailResponseMock = (overrideResponse: Partial< User > = {}): User => ({id: faker.string.alpha(20), email: faker.string.alpha(20), password: faker.string.alpha(20), name: faker.string.alpha(20), role: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
+export const getCompaniesControllerFindOneResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
 
-export const getCompaniesControllerFindAllResponseMock = (): Company[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20)})))
-
-export const getCompaniesControllerCreateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
-
-export const getCompaniesControllerFindOneResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
-
-export const getCompaniesControllerUpdateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), checklistIds: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.number.int({min: undefined, max: undefined}))), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
+export const getCompaniesControllerUpdateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
 
 export const getEmployeesControllerCreateResponseMock = (overrideResponse: Partial< CreateEmployeeResponse > = {}): CreateEmployeeResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), phone: faker.string.alpha(20), ...overrideResponse})
 
-export const getEmployeesControllerFindListResponseMock = (overrideResponse: Partial< Employee > = {}): Employee => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), phone: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), password: faker.string.alpha(20), role_id: faker.string.alpha(20), ...overrideResponse})
+export const getEmployeesControllerFindListResponseMock = (overrideResponse: Partial< Employee > = {}): Employee => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), phone: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), password: faker.string.alpha(20), role_id: faker.string.alpha(20), questionId: {}, ...overrideResponse})
 
 export const getChecklistsControllerCreateResponseMock = (overrideResponse: Partial< CheckList > = {}): CheckList => ({id: faker.string.alpha(20), name: faker.string.alpha(20), expiries_in: `${faker.date.past().toISOString().split('.')[0]}Z`, created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
 
-export const getChecklistsControllerFindAllResponseMock = (): Checklist[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), categories: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({categoryName: faker.string.alpha(20), questions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({questionText: faker.string.alpha(20), questionType: faker.helpers.arrayElement(['multiple-choice','text','boolean'] as const), options: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.string.alpha(20))), undefined]), isRequired: faker.datatype.boolean(), position: faker.number.int({min: undefined, max: undefined})}))})), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined])})))
+export const getChecklistsControllerFindPaginatedByParamsResponseMock = (): CheckListItemFormattedList[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), categories_id: faker.string.alpha(20), checkList_id: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, checklistName: faker.string.alpha(20), companyName: faker.string.alpha(20), companyId: faker.string.alpha(20), hasAnomalies: faker.datatype.boolean()})))
 
-export const getChecklistsControllerFindOneResponseMock = (): Checklist[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), categories: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({categoryName: faker.string.alpha(20), questions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({questionText: faker.string.alpha(20), questionType: faker.helpers.arrayElement(['multiple-choice','text','boolean'] as const), options: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.string.alpha(20))), undefined]), isRequired: faker.datatype.boolean(), position: faker.number.int({min: undefined, max: undefined})}))})), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined])})))
-
-export const getChecklistsControllerUpdateResponseMock = (overrideResponse: Partial< Checklist > = {}): Checklist => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), categories: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({categoryName: faker.string.alpha(20), questions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({questionText: faker.string.alpha(20), questionType: faker.helpers.arrayElement(['multiple-choice','text','boolean'] as const), options: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.string.alpha(20))), undefined]), isRequired: faker.datatype.boolean(), position: faker.number.int({min: undefined, max: undefined})}))})), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), ...overrideResponse})
+export const getChecklistsControllerFindPaginatedByEmployeeParamsResponseMock = (): CheckListForSpecificEmployee[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({checklistItemId: faker.string.alpha(20), checklistName: faker.string.alpha(20)})))
 
 export const getRolesControllerFindListResponseMock = (): Roles[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), name: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`})))
 
 export const getCategoriesControllerFindListResponseMock = (): Categories[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), name: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`})))
 
 export const getCategoriesControllerCreateResponseMock = (overrideResponse: Partial< Categories > = {}): Categories => ({id: faker.string.alpha(20), name: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
+
+export const getQuestionsControllerFindListResponseMock = (overrideResponse: Partial< QuestionsWithChoices > = {}): QuestionsWithChoices => ({id: faker.string.alpha(20), question: faker.string.alpha(20), type: faker.helpers.arrayElement(['Upload de arquivo','Múltipla escolha','Texto'] as const), isRequired: faker.datatype.boolean(), checkListItem_id: faker.string.alpha(20), IAPrompt: faker.helpers.arrayElement([faker.string.alpha(20), null]), choices: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), choice: faker.string.alpha(20), anomaly: faker.helpers.arrayElement(['LOW','MEDIUM','HIGH'] as const), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, question_id: faker.string.alpha(20), updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`})), undefined]), ...overrideResponse})
 
 
 export const getAppControllerGetHelloMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
@@ -122,42 +117,6 @@ export const getAuthControllerGetUserAuthMockHandler = (overrideResponse?: UserA
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
             : getAuthControllerGetUserAuthResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getUsersControllerCreateMockHandler = (overrideResponse?: User | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<User> | User)) => {
-  return http.post('*/users', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getUsersControllerCreateResponseMock()),
-      { status: 201,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getUsersControllerGetAllUsersMockHandler = (overrideResponse?: User[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<User[]> | User[])) => {
-  return http.get('*/users', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getUsersControllerGetAllUsersResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getUsersControllerGetByEmailMockHandler = (overrideResponse?: User | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<User> | User)) => {
-  return http.get('*/users/:email', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getUsersControllerGetByEmailResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -258,48 +217,26 @@ export const getChecklistsControllerCreateMockHandler = (overrideResponse?: Chec
   })
 }
 
-export const getChecklistsControllerFindAllMockHandler = (overrideResponse?: Checklist[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Checklist[]> | Checklist[])) => {
+export const getChecklistsControllerFindPaginatedByParamsMockHandler = (overrideResponse?: CheckListItemFormattedList[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CheckListItemFormattedList[]> | CheckListItemFormattedList[])) => {
   return http.get('*/checklists', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getChecklistsControllerFindAllResponseMock()),
+            : getChecklistsControllerFindPaginatedByParamsResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
   })
 }
 
-export const getChecklistsControllerFindOneMockHandler = (overrideResponse?: Checklist[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Checklist[]> | Checklist[])) => {
-  return http.get('*/checklists/:id', async (info) => {await delay(1000);
+export const getChecklistsControllerFindPaginatedByEmployeeParamsMockHandler = (overrideResponse?: CheckListForSpecificEmployee[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CheckListForSpecificEmployee[]> | CheckListForSpecificEmployee[])) => {
+  return http.get('*/checklists/by-employee', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getChecklistsControllerFindOneResponseMock()),
+            : getChecklistsControllerFindPaginatedByEmployeeParamsResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getChecklistsControllerUpdateMockHandler = (overrideResponse?: Checklist | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Checklist> | Checklist)) => {
-  return http.put('*/checklists/:id', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getChecklistsControllerUpdateResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getChecklistsControllerRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void)) => {
-  return http.delete('*/checklists/:id', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 200,
-        
       })
   })
 }
@@ -339,15 +276,24 @@ export const getCategoriesControllerCreateMockHandler = (overrideResponse?: Cate
       })
   })
 }
+
+export const getQuestionsControllerFindListMockHandler = (overrideResponse?: QuestionsWithChoices | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<QuestionsWithChoices> | QuestionsWithChoices)) => {
+  return http.get('*/questions', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getQuestionsControllerFindListResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
 export const getIndicadorOnlineAPIMock = () => [
   getAppControllerGetHelloMockHandler(),
   getAuthControllerLoginDashboardMockHandler(),
   getAuthControllerLoginMobileMockHandler(),
   getAuthControllerRefreshTokenMockHandler(),
   getAuthControllerGetUserAuthMockHandler(),
-  getUsersControllerCreateMockHandler(),
-  getUsersControllerGetAllUsersMockHandler(),
-  getUsersControllerGetByEmailMockHandler(),
   getCompaniesControllerFindAllMockHandler(),
   getCompaniesControllerCreateMockHandler(),
   getCompaniesControllerFindOneMockHandler(),
@@ -356,10 +302,9 @@ export const getIndicadorOnlineAPIMock = () => [
   getEmployeesControllerCreateMockHandler(),
   getEmployeesControllerFindListMockHandler(),
   getChecklistsControllerCreateMockHandler(),
-  getChecklistsControllerFindAllMockHandler(),
-  getChecklistsControllerFindOneMockHandler(),
-  getChecklistsControllerUpdateMockHandler(),
-  getChecklistsControllerRemoveMockHandler(),
+  getChecklistsControllerFindPaginatedByParamsMockHandler(),
+  getChecklistsControllerFindPaginatedByEmployeeParamsMockHandler(),
   getRolesControllerFindListMockHandler(),
   getCategoriesControllerFindListMockHandler(),
-  getCategoriesControllerCreateMockHandler()]
+  getCategoriesControllerCreateMockHandler(),
+  getQuestionsControllerFindListMockHandler()]

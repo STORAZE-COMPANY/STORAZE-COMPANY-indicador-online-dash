@@ -44,25 +44,6 @@ export interface TokenDto {
   refreshToken: string;
 }
 
-export interface User {
-  /** Nome do usuário */
-  id: string;
-  /** Email do usuário */
-  email: string;
-  /** Senha do usuário */
-  password: string;
-  /** Nome do usuário (opcional) */
-  name: string;
-  /** Papel do usuário (opcional) */
-  role: string;
-  /** Data de criação do usuário (opcional) */
-  created_at: string;
-  /** Data de atualização do usuário (opcional) */
-  updated_at: string;
-}
-
-export interface ConflictException { [key: string]: unknown }
-
 export interface Company {
   /** ID da empresa */
   id: number;
@@ -74,8 +55,6 @@ export interface Company {
   cnpj: string;
   /** Se a empresa está ativa */
   isActive: boolean;
-  /** IDs dos checklists associados à empresa */
-  checklistIds: number[];
   /** Data de criação da empresa */
   created_at?: string;
   /** Última atualização da empresa */
@@ -95,11 +74,11 @@ export interface CreateCompanyDto {
   isActive: boolean;
   /** Email da empresa */
   email: string;
-  /** IDs dos checklists associados à empresa */
-  checklistIds: number[];
   /** ID do nível de acesso associada à empresa */
   roleId: string;
 }
+
+export interface ConflictException { [key: string]: unknown }
 
 export interface UpdateCompanyDto {
   /** Nome da empresa */
@@ -138,6 +117,11 @@ export interface CreateEmployeeResponse {
   phone: string;
 }
 
+/**
+ * Id do nível do funcionário
+ */
+export type EmployeeQuestionId = { [key: string]: unknown };
+
 export interface Employee {
   /** Id do funcionário */
   id: number;
@@ -153,6 +137,8 @@ export interface Employee {
   password: string;
   /** Id do nível do funcionário */
   role_id: string;
+  /** Id do nível do funcionário */
+  questionId: EmployeeQuestionId;
 }
 
 /**
@@ -249,90 +235,32 @@ export interface CheckList {
   updated_at: string;
 }
 
-/**
- * Tipo da pergunta
- */
-export type QuestionQuestionType = typeof QuestionQuestionType[keyof typeof QuestionQuestionType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const QuestionQuestionType = {
-  'multiple-choice': 'multiple-choice',
-  text: 'text',
-  boolean: 'boolean',
-} as const;
-
-export interface Question {
-  /** Texto da pergunta */
-  questionText: string;
-  /** Tipo da pergunta */
-  questionType: QuestionQuestionType;
-  /** Opções disponíveis para a pergunta */
-  options?: string[];
-  /** Define se a pergunta é obrigatória */
-  isRequired: boolean;
-  /** Posição da pergunta na categoria */
-  position: number;
-}
-
-export interface Category {
-  /** Nome da categoria */
-  categoryName: string;
-  /** Lista de perguntas dentro da categoria */
-  questions: Question[];
-}
-
-export interface Checklist {
-  /** ID único do checklist */
-  id: number;
+export interface CheckListItemFormattedList {
+  /** id */
+  id: string;
+  /** categories_id */
+  categories_id: string;
+  /** checkList_id */
+  checkList_id: string;
+  /** created_at */
+  created_at: string;
+  /** updated_at */
+  updated_at: string;
   /** Nome do checklist */
-  name: string;
-  /** Lista de categorias dentro do checklist */
-  categories: Category[];
-  /** Data de criação */
-  created_at?: string;
-  /** Última atualização */
-  updated_at?: string;
+  checklistName: string;
+  /** Nome da empresa vinculada ao checklist */
+  companyName: string;
+  /** ID da empresa vinculada ao checklist */
+  companyId: string;
+  /** Se o checklist tem anomalias */
+  hasAnomalies: boolean;
 }
 
-/**
- * Tipo da pergunta
- */
-export type QuestionDtoQuestionType = typeof QuestionDtoQuestionType[keyof typeof QuestionDtoQuestionType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const QuestionDtoQuestionType = {
-  Upload_de_arquivo: 'Upload de arquivo',
-  Múltipla_escolha: 'Múltipla escolha',
-  Texto: 'Texto',
-} as const;
-
-export interface QuestionDto {
-  /** Texto da pergunta */
-  questionText: string;
-  /** Tipo da pergunta */
-  questionType: QuestionDtoQuestionType;
-  /** Opções da pergunta */
-  options: string[];
-  /** Indica se a pergunta é obrigatória */
-  isRequired: boolean;
-  /** Posição da pergunta */
-  position: number;
-}
-
-export interface CategoryDto {
-  /** Nome da categoria */
-  categoryName: string;
-  /** Lista de perguntas dentro da categoria */
-  questions: QuestionDto[];
-}
-
-export interface UpdateChecklistDto {
+export interface CheckListForSpecificEmployee {
+  /** ID do checklist */
+  checklistItemId: string;
   /** Nome do checklist */
-  name: string;
-  /** Lista de categorias do checklist */
-  categories: CategoryDto[];
+  checklistName: string;
 }
 
 export interface Roles {
@@ -362,11 +290,105 @@ export interface CreateCategoriesDto {
   name: string;
 }
 
+export type ChoicesAnomaly = typeof ChoicesAnomaly[keyof typeof ChoicesAnomaly];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ChoicesAnomaly = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+} as const;
+
+export interface Choices {
+  id: string;
+  choice: string;
+  anomaly: ChoicesAnomaly;
+  created_at: string;
+  question_id: string;
+  updated_at: string;
+}
+
+/**
+ * Tipo de resposta da questão
+ */
+export type QuestionsWithChoicesType = typeof QuestionsWithChoicesType[keyof typeof QuestionsWithChoicesType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const QuestionsWithChoicesType = {
+  Upload_de_arquivo: 'Upload de arquivo',
+  Múltipla_escolha: 'Múltipla escolha',
+  Texto: 'Texto',
+} as const;
+
+export interface QuestionsWithChoices {
+  /** ID da questão */
+  id: string;
+  /** Questão */
+  question: string;
+  /** Tipo de resposta da questão */
+  type: QuestionsWithChoicesType;
+  /** Se a questão é obrigatória */
+  isRequired: boolean;
+  /** ID do checklist */
+  checkListItem_id: string;
+  /**
+   * Prompt da IA
+   * @nullable
+   */
+  IAPrompt: string | null;
+  /** Se multipla escolha as question choices */
+  choices?: Choices[];
+}
+
 export type EmployeesControllerFindListParams = {
 /**
  * Query de busca
  */
 query?: string;
+/**
+ * Limite de registros por página
+ */
+limit: string;
+/**
+ * Página de registros
+ */
+page: string;
+};
+
+export type ChecklistsControllerFindPaginatedByParamsParams = {
+/**
+ * Data inicial
+ */
+startDate?: string;
+/**
+ * Data final
+ */
+endDate?: string;
+/**
+ * Buscar por empresa
+ */
+byCompany?: number;
+/**
+ * Limite de registros por página
+ */
+limit: string;
+/**
+ * Página de registros
+ */
+page: string;
+};
+
+export type ChecklistsControllerFindPaginatedByEmployeeParamsParams = {
+/**
+ * ID do funcionário
+ */
+employeeId: string;
+};
+
+export type QuestionsControllerFindListParams = {
+checkListItemId: string;
 /**
  * Limite de registros por página
  */

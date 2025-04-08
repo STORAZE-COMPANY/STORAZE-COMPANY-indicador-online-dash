@@ -19,52 +19,59 @@ import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const initialValues = {
   name: "",
-  cnpj: "",
   email: "",
-  isActive: true,
+  phone: "",
+  company_id: "",
   roleId: "",
 };
 
-const empresaSchema = yup.object().shape({
+const employeeSchema = yup.object().shape({
   name: yup.string().required("Campo obrigatório"),
-  cnpj: yup.string().required("Campo obrigatório"),
   email: yup.string().email("Email inválido").required("Campo obrigatório"),
+  phone: yup.string().required("Campo obrigatório"),
+  company_id: yup.string().required("Empresa obrigatória"),
   roleId: yup.string().required("Nível de acesso obrigatório"),
 });
 
-const CreateCompany = () => {
+const CreateEmployees = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const { companiesControllerCreate, rolesControllerFindList } =
+  const { employeesControllerCreate, rolesControllerFindList, companiesControllerFindAll } =
     getIndicadorOnlineAPI();
 
   const [roles, setRoles] = useState([]);
+  const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchData = async () => {
       try {
-        const response = await rolesControllerFindList();
-        setRoles(response);
+        const [rolesRes, companiesRes] = await Promise.all([
+          rolesControllerFindList(),
+          companiesControllerFindAll(),
+        ]);
+        setRoles(rolesRes);
+        setCompanies(companiesRes);
       } catch (err) {
-        toast.error("Erro ao carregar níveis de acesso");
+        toast.error("Erro ao carregar dados");
         console.error(err);
       }
     };
 
-    fetchRoles();
+    fetchData();
   }, []);
 
   const handleFormSubmit = async (values, actions) => {
     try {
       const payload = {
         ...values,
-        cnpj: values.cnpj.replace(/\D/g, ""),
+        phone: values.phone.replace(/\D/g, ""),
+        company_id: Number(values.company_id),
       };
 
-      await companiesControllerCreate(payload);
-      toast.success("Empresa criada com sucesso!");
+      await employeesControllerCreate(payload);
+      toast.success("Funcionário criado com sucesso!");
       actions.resetForm({ values: initialValues });
     } catch (err) {
-      toast.error("Erro ao criar empresa.");
+      toast.error("Erro ao criar funcionário.");
       console.error(err);
     }
   };
@@ -72,14 +79,14 @@ const CreateCompany = () => {
   return (
     <Box m="20px">
       <Header
-        title="Criar Empresa"
-        subtitle="Preencha as informações da empresa"
+        title="Criar Funcionário"
+        subtitle="Preencha as informações do funcionário"
       />
 
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={empresaSchema}
+        validationSchema={employeeSchema}
       >
         {({
           values,
@@ -105,7 +112,7 @@ const CreateCompany = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Nome da Empresa"
+                label="Nome"
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -115,26 +122,6 @@ const CreateCompany = () => {
                 sx={{ gridColumn: "span 4" }}
               />
 
-              <InputMask
-                mask="99.999.999/9999-99"
-                value={values.cnpj}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              >
-                {(inputProps) => (
-                  <TextField
-                    {...inputProps}
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="CNPJ"
-                    name="cnpj"
-                    error={touched.cnpj && !!errors.cnpj}
-                    helperText={touched.cnpj && errors.cnpj}
-                    sx={{ gridColumn: "span 2" }}
-                  />
-                )}
-              </InputMask>
               <TextField
                 fullWidth
                 variant="filled"
@@ -149,7 +136,55 @@ const CreateCompany = () => {
                 sx={{ gridColumn: "span 2" }}
               />
 
-              <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
+              <InputMask
+                mask="(99) 99999-9999"
+                value={values.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              >
+                {(inputProps) => (
+                  <TextField
+                    {...inputProps}
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Telefone"
+                    name="phone"
+                    error={touched.phone && !!errors.phone}
+                    helperText={touched.phone && errors.phone}
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                )}
+              </InputMask>
+
+              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="company-label" sx={{ color: "#999" }}>
+                  Empresa
+                </InputLabel>
+                <Select
+                  labelId="company-label"
+                  name="company_id"
+                  value={values.company_id}
+                  onChange={(e) => setFieldValue("company_id", e.target.value)}
+                  onBlur={handleBlur}
+                  variant="filled"
+                  sx={{ color: "#fff" }}
+                  error={touched.company_id && !!errors.company_id}
+                >
+                  {companies.map((company) => (
+                    <MenuItem key={company.id} value={company.id}>
+                      {company.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {touched.company_id && errors.company_id && (
+                  <Typography color="error" fontSize={13}>
+                    {errors.company_id}
+                  </Typography>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
                 <InputLabel id="role-label" sx={{ color: "#999" }}>
                   Nível de Acesso
                 </InputLabel>
@@ -179,7 +214,7 @@ const CreateCompany = () => {
 
             <Box display="flex" justifyContent="flex-end" mt={4}>
               <Button type="submit" color="secondary" variant="contained">
-                Criar Empresa
+                Criar Funcionário
               </Button>
             </Box>
           </form>
@@ -190,4 +225,4 @@ const CreateCompany = () => {
   );
 };
 
-export default CreateCompany;
+export default CreateEmployees;

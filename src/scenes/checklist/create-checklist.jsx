@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -22,12 +22,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import api from "../../api/axios";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const ChecklistForm = () => {
-  const { checklistsControllerCreate } = getIndicadorOnlineAPI();
-
+  const { checklistsControllerCreate, categoriesControllerFindList } = getIndicadorOnlineAPI();
+  const [availableCategories, setAvailableCategories] = useState([]);
   const [checklistName, setChecklistName] = useState("");
   const [expiriesIn, setExpiriesIn] = useState("");
 
@@ -47,6 +46,19 @@ const ChecklistForm = () => {
       ],
     },
   ]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoriesControllerFindList(); 
+        setAvailableCategories(response); 
+      } catch (error) {
+        toast.error("Erro ao carregar categorias");
+      }
+    };
+  
+    fetchCategories();
+  }, []);
 
   const handleAddCategory = () => {
     setCategories([
@@ -247,17 +259,24 @@ const ChecklistForm = () => {
             Categoria {catIdx + 1}/{categories.length}
           </Box>
 
-          <TextField
-            fullWidth
-            placeholder="Digite o nome da categoria"
-            value={cat.categoryName}
-            onChange={(e) => {
-              const newCategories = [...categories];
-              newCategories[catIdx].categoryName = e.target.value;
-              setCategories(newCategories);
-            }}
-            sx={{ mb: 3, backgroundColor: "#3b4050", input: { color: "#fff" } }}
-          />
+          <FormControl fullWidth sx={{ mb: 3 }}>
+  <InputLabel sx={{ color: "#fff" }}>Categoria</InputLabel>
+  <Select
+    value={cat.categoryName}
+    onChange={(e) => {
+      const newCategories = [...categories];
+      newCategories[catIdx].categoryName = e.target.value;
+      setCategories(newCategories);
+    }}
+    sx={{ backgroundColor: "#3b4050", color: "#fff" }}
+  >
+    {availableCategories.map((catItem) => (
+      <MenuItem key={catItem.id} value={catItem.id}>
+        {catItem.name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
           {cat.questions.map((q, qIdx) => (
             <Box key={q.id} mb={3} p={2} bgcolor="#6E7484" borderRadius={2}>

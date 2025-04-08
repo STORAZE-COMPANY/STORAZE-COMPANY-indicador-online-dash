@@ -8,7 +8,10 @@
 import type {
   Categories,
   CheckList,
-  Checklist,
+  CheckListForSpecificEmployee,
+  CheckListItemFormattedList,
+  ChecklistsControllerFindPaginatedByEmployeeParamsParams,
+  ChecklistsControllerFindPaginatedByParamsParams,
   Company,
   CreateCategoriesDto,
   CreateCheckListDto,
@@ -18,12 +21,12 @@ import type {
   Employee,
   EmployeesControllerFindListParams,
   LoginDto,
+  QuestionsControllerFindListParams,
+  QuestionsWithChoices,
   ResponseAuthDto,
   Roles,
   TokenDto,
-  UpdateChecklistDto,
   UpdateCompanyDto,
-  User,
   UserAuth
 } from './api.schemas';
 
@@ -81,35 +84,6 @@ const authControllerGetUserAuth = (
  options?: SecondParameter<typeof customInstance>,) => {
       return customInstance<UserAuth>(
       {url: `http://localhost:3000/auth/userAuth`, method: 'GET'
-    },
-      options);
-    }
-  
-const usersControllerCreate = (
-    user: User,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<User>(
-      {url: `http://localhost:3000/users`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: user
-    },
-      options);
-    }
-  
-const usersControllerGetAllUsers = (
-    
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<User[]>(
-      {url: `http://localhost:3000/users`, method: 'GET'
-    },
-      options);
-    }
-  
-const usersControllerGetByEmail = (
-    email: string,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<User>(
-      {url: `http://localhost:3000/users/${email}`, method: 'GET'
     },
       options);
     }
@@ -196,41 +170,22 @@ const checklistsControllerCreate = (
       options);
     }
   
-const checklistsControllerFindAll = (
-    
+const checklistsControllerFindPaginatedByParams = (
+    params: ChecklistsControllerFindPaginatedByParamsParams,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<Checklist[]>(
-      {url: `http://localhost:3000/checklists`, method: 'GET'
+      return customInstance<CheckListItemFormattedList[]>(
+      {url: `http://localhost:3000/checklists`, method: 'GET',
+        params
     },
       options);
     }
   
-const checklistsControllerFindOne = (
-    id: number,
+const checklistsControllerFindPaginatedByEmployeeParams = (
+    params: ChecklistsControllerFindPaginatedByEmployeeParamsParams,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<Checklist[]>(
-      {url: `http://localhost:3000/checklists/${id}`, method: 'GET'
-    },
-      options);
-    }
-  
-const checklistsControllerUpdate = (
-    id: number,
-    updateChecklistDto: UpdateChecklistDto,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<Checklist>(
-      {url: `http://localhost:3000/checklists/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateChecklistDto
-    },
-      options);
-    }
-  
-const checklistsControllerRemove = (
-    id: number,
- options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<void>(
-      {url: `http://localhost:3000/checklists/${id}`, method: 'DELETE'
+      return customInstance<CheckListForSpecificEmployee[]>(
+      {url: `http://localhost:3000/checklists/by-employee`, method: 'GET',
+        params
     },
       options);
     }
@@ -264,7 +219,17 @@ const categoriesControllerCreate = (
       options);
     }
   
-return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,usersControllerCreate,usersControllerGetAllUsers,usersControllerGetByEmail,companiesControllerFindAll,companiesControllerCreate,companiesControllerFindOne,companiesControllerUpdate,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,checklistsControllerCreate,checklistsControllerFindAll,checklistsControllerFindOne,checklistsControllerUpdate,checklistsControllerRemove,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate}};
+const questionsControllerFindList = (
+    params: QuestionsControllerFindListParams,
+ options?: SecondParameter<typeof customInstance>,) => {
+      return customInstance<QuestionsWithChoices>(
+      {url: `http://localhost:3000/questions`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindAll,companiesControllerCreate,companiesControllerFindOne,companiesControllerUpdate,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -275,9 +240,6 @@ export type AuthControllerLoginDashboardResult = NonNullable<Awaited<ReturnType<
 export type AuthControllerLoginMobileResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerLoginMobile']>>>
 export type AuthControllerRefreshTokenResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerRefreshToken']>>>
 export type AuthControllerGetUserAuthResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerGetUserAuth']>>>
-export type UsersControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['usersControllerCreate']>>>
-export type UsersControllerGetAllUsersResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['usersControllerGetAllUsers']>>>
-export type UsersControllerGetByEmailResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['usersControllerGetByEmail']>>>
 export type CompaniesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindAll']>>>
 export type CompaniesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerCreate']>>>
 export type CompaniesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindOne']>>>
@@ -286,10 +248,9 @@ export type CompaniesControllerRemoveResult = NonNullable<Awaited<ReturnType<Ret
 export type EmployeesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerCreate']>>>
 export type EmployeesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerFindList']>>>
 export type ChecklistsControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerCreate']>>>
-export type ChecklistsControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindAll']>>>
-export type ChecklistsControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindOne']>>>
-export type ChecklistsControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdate']>>>
-export type ChecklistsControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerRemove']>>>
+export type ChecklistsControllerFindPaginatedByParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByParams']>>>
+export type ChecklistsControllerFindPaginatedByEmployeeParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByEmployeeParams']>>>
 export type RolesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['rolesControllerFindList']>>>
 export type CategoriesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['categoriesControllerFindList']>>>
 export type CategoriesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['categoriesControllerCreate']>>>
+export type QuestionsControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerFindList']>>>

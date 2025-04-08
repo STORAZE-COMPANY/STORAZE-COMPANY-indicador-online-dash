@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(checkAuth());
 
   const login = ({ access_token, refresh_token }) => {
-
     storeToken({ access_token, refresh_token });
     setAuth(true);
   };

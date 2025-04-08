@@ -1,63 +1,44 @@
+import { useEffect, useState } from "react";
 import { Box, Typography, Button, useTheme } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import { AddBusinessOutlined } from "@mui/icons-material";
-
-const mockDataEmpresas = [
-  {
-    id: 1,
-    nome: "TransLog",
-    cidade: "Lisboa",
-    contacto: "+351 912 345 678",
-    email: "info@translog.pt",
-    status: "Ativa",
-    checklists: ["Segurança", "TI"],
-  },
-  {
-    id: 2,
-    nome: "RápidoTrans",
-    cidade: "Porto",
-    contacto: "+351 923 456 789",
-    email: "contato@rapidotrans.pt",
-    status: "Inativa",
-    checklists: ["Limpeza"],
-  },
-  {
-    id: 3,
-    nome: "CargaCerta",
-    cidade: "Coimbra",
-    contacto: "+351 934 567 890",
-    email: "apoio@cargacerta.pt",
-    status: "Ativa",
-    checklists: ["Frota", "TI", "Segurança"],
-  },
-  {
-    id: 4,
-    nome: "EntregasExpress",
-    cidade: "Aveiro",
-    contacto: "+351 945 678 901",
-    email: "express@entregasexpress.pt",
-    status: "Ativa",
-    checklists: [],
-  },
-  {
-    id: 5,
-    nome: "VelozCargo",
-    cidade: "Braga",
-    contacto: "+351 956 789 012",
-    email: "suporte@velozcargo.pt",
-    status: "Inativa",
-    checklists: ["TI"],
-  },
-];
+import { getIndicadorOnlineAPI } from "../../api/generated/api";
+import { toast } from "react-toastify";
 
 const Company = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  
+  const { companiesControllerFindAll } = getIndicadorOnlineAPI();
+
+  const [empresas, setEmpresas] = useState([]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await companiesControllerFindAll();
+        const formatted = response.map((item) => ({
+          id: item.id,
+          nome: item.name,
+          email: item.email,
+          status: item.isActive ? "Ativa" : "Inativa",
+          cidade: "N/A", 
+          contacto: "N/A", 
+          checklists: [], 
+        }));
+        setEmpresas(formatted);
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro ao buscar empresas");
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
     {
@@ -117,12 +98,10 @@ const Company = () => {
         </Box>
       ),
     },
-    
   ];
 
   const handleCriarEmpresaClick = () => {
-    console.log("chegou")
-    navigate("/create-company"); 
+    navigate("/create-company");
   };
 
   return (
@@ -166,7 +145,7 @@ const Company = () => {
         }}
       >
         <DataGrid
-          rows={mockDataEmpresas}
+          rows={empresas}
           columns={columns}
           initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           checkboxSelection

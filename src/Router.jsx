@@ -23,6 +23,10 @@ import ChecklistForm from "./scenes/checklist/create-checklist";
 import ChecklistList from "./scenes/checklist";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import FormResponses from "./scenes/formResponse/index.jsx";
+import Employees from "./scenes/employees/index.jsx";
+import CreateEmployees from "./scenes/employees/create-employees.jsx";
+import Category from "./scenes/categories/index.jsx";
+import CreateCategory from "./scenes/categories/create-category.jsx";
 
 const AppRouter = () => {
   return (
@@ -41,8 +45,15 @@ const AppRouter = () => {
           <Route index element={<Dashboard />} />
 
           <Route path="/team" element={<Team />} />
+
+          <Route path="/create-category" element={<CreateCategory />} />
+          <Route path="/category" element={<Category />} />
+
           <Route path="/create-company" element={<CreateCompany />} />
           <Route path="/company" element={<Company />} />
+
+          <Route path="/create-employees" element={<CreateEmployees />} />
+          <Route path="/employees" element={<Employees />} />
 
           <Route path="/checklists" element={<ChecklistList />} />
           <Route path="/formresponse" element={<FormResponses />} />
