@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken, getRefreshToken, login, logout } from "../auth/auth";
 
 const instance = axios.create({
+  //baseURL: "http://localhost:3000", 
   baseURL: "http://localhost:3000", 
 });
 

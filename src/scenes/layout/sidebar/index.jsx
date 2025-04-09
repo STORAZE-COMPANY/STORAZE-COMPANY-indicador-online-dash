@@ -182,7 +182,7 @@ const SideBar = () => {
             icon={<BadgeOutlinedIcon />}
           />
           <Item
-            title="Gerenciar Checklist"
+            title="Gerenciar Respostas"
             path="/formresponse"
             colors={colors}
             icon={<ManageSearchOutlinedIcon />}

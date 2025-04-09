@@ -20,6 +20,8 @@ const Company = () => {
     const fetchCompanies = async () => {
       try {
         const response = await companiesControllerFindAll();
+
+        console.log("response", response)
         const formatted = response.map((item) => ({
           id: item.id,
           nome: item.name,

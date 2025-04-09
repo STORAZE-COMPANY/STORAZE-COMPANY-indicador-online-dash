@@ -21,7 +21,10 @@ const Category = () => {
       try {
         const response = await categoriesControllerFindList();
 
-        const formatted = response.map((cat) => ({
+        console.log("response",response);
+        
+
+        const formatted = response?.map((cat) => ({
           id: cat.id,
           nome: cat.name,
           dataCriacao: new Date(cat.created_at).toLocaleDateString(),

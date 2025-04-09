@@ -1,20 +1,9 @@
-import axios, { AxiosRequestConfig } from "axios";
-import { getToken, getRefreshToken, logout, login } from "../auth/auth";
-import { getIndicadorOnlineAPI } from "./generated/api";
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { getToken, getRefreshToken, login, logout } from '../auth/auth';
 
-// Instância principal do Axios
-const api = axios.create({
-  baseURL: "http://localhost:3000", 
+const api: AxiosInstance = axios.create({
+  baseURL: 'http://localhost:3000', 
 });
-
-
-export const customInstance = async <T>(
-  config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
-): Promise<T> => {
-  return await api({ ...config, ...options }).then((res) => res.data);
-};
-
 
 api.interceptors.request.use((config) => {
   const token = getToken();
@@ -27,39 +16,34 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refreshToken") &&
+      !originalRequest.url.includes('/auth/refreshToken') &&
       getRefreshToken()
     ) {
       originalRequest._retry = true;
 
       try {
-        const { authControllerRefreshToken } = getIndicadorOnlineAPI();
-
-        const { data } = await authControllerRefreshToken({
+        const refreshResponse = await api.post('/auth/refreshToken', {
           refreshToken: getRefreshToken(),
         });
 
-        const { access_token, refresh_token } = data;
+        const { access_token, refresh_token } = refreshResponse.data;
 
-      
         login({ access_token, refresh_token });
 
-       
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return api(originalRequest);
       } catch (refreshError) {
-        logout();
-        window.location.href = "/login"; 
+        console.log("refreshError", refreshError)
+      /*   logout();
+        window.location.href = '/login'; */
         return Promise.reject(refreshError);
       }
     }
@@ -67,5 +51,12 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// função usada pelo Orval como `mutator`
+export const customInstance = <T = unknown>(
+  config: AxiosRequestConfig
+): Promise<T> => {
+  return api(config).then((res) => res.data);
+};
 
 export default api;
