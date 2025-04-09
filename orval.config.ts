@@ -19,7 +19,7 @@ export default defineConfig({
       // Habilita a geração de mocks para os endpoints
       mock: true,
       // Define a URL base para as requisições
-      baseUrl: 'https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app',
+      baseUrl: 'http://localhost:3000',
       override: {
         mutator: {
           path: 'src/api/axios.ts',

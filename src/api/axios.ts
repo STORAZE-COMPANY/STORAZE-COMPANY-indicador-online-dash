@@ -42,8 +42,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         console.log("refreshError", refreshError)
-      /*   logout();
-        window.location.href = '/login'; */
+        logout();
+        window.location.href = '/login'; 
         return Promise.reject(refreshError);
       }
     }

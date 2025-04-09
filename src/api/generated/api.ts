@@ -47,7 +47,7 @@ const appControllerGetHello = (
     
  ) => {
       return customInstance<void>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/`, method: 'GET'
+      {url: `http://localhost:3000/`, method: 'GET'
     },
       );
     }
@@ -56,7 +56,7 @@ const authControllerLoginDashboard = (
     loginDto: LoginDto,
  ) => {
       return customInstance<ResponseAuthDto>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/auth/loginDashboard`, method: 'POST',
+      {url: `http://localhost:3000/auth/loginDashboard`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginDto
     },
@@ -67,7 +67,7 @@ const authControllerLoginMobile = (
     loginDto: LoginDto,
  ) => {
       return customInstance<ResponseAuthDto>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/auth/loginMobile`, method: 'POST',
+      {url: `http://localhost:3000/auth/loginMobile`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginDto
     },
@@ -78,7 +78,7 @@ const authControllerRefreshToken = (
     tokenDto: TokenDto,
  ) => {
       return customInstance<ResponseAuthDto>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/auth/refreshToken`, method: 'POST',
+      {url: `http://localhost:3000/auth/refreshToken`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: tokenDto
     },
@@ -89,7 +89,7 @@ const authControllerGetUserAuth = (
     
  ) => {
       return customInstance<UserAuth>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/auth/userAuth`, method: 'GET'
+      {url: `http://localhost:3000/auth/userAuth`, method: 'GET'
     },
       );
     }
@@ -98,7 +98,7 @@ const companiesControllerFindAll = (
     
  ) => {
       return customInstance<Company[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/companies`, method: 'GET'
+      {url: `http://localhost:3000/companies`, method: 'GET'
     },
       );
     }
@@ -107,7 +107,7 @@ const companiesControllerCreate = (
     createCompanyDto: CreateCompanyDto,
  ) => {
       return customInstance<Company>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/companies`, method: 'POST',
+      {url: `http://localhost:3000/companies`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createCompanyDto
     },
@@ -118,7 +118,7 @@ const companiesControllerFindOne = (
     id: number,
  ) => {
       return customInstance<Company>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/companies/${id}`, method: 'GET'
+      {url: `http://localhost:3000/companies/${id}`, method: 'GET'
     },
       );
     }
@@ -128,7 +128,7 @@ const companiesControllerUpdate = (
     updateCompanyDto: UpdateCompanyDto,
  ) => {
       return customInstance<Company>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/companies/${id}`, method: 'PUT',
+      {url: `http://localhost:3000/companies/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateCompanyDto
     },
@@ -139,7 +139,7 @@ const companiesControllerRemove = (
     id: number,
  ) => {
       return customInstance<void>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/companies/${id}`, method: 'DELETE'
+      {url: `http://localhost:3000/companies/${id}`, method: 'DELETE'
     },
       );
     }
@@ -148,7 +148,7 @@ const employeesControllerCreate = (
     createEmployeeDto: CreateEmployeeDto,
  ) => {
       return customInstance<CreateEmployeeResponse>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/employees`, method: 'POST',
+      {url: `http://localhost:3000/employees`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createEmployeeDto
     },
@@ -159,7 +159,7 @@ const employeesControllerFindList = (
     params: EmployeesControllerFindListParams,
  ) => {
       return customInstance<EmployeeListDto[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/employees`, method: 'GET',
+      {url: `http://localhost:3000/employees`, method: 'GET',
         params
     },
       );
@@ -169,7 +169,7 @@ const checklistsControllerCreate = (
     createCheckListDto: CreateCheckListDto,
  ) => {
       return customInstance<CheckList>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/checklists`, method: 'POST',
+      {url: `http://localhost:3000/checklists`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createCheckListDto
     },
@@ -180,7 +180,7 @@ const checklistsControllerFindPaginatedByParams = (
     params: ChecklistsControllerFindPaginatedByParamsParams,
  ) => {
       return customInstance<CheckListItemFormattedList[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/checklists`, method: 'GET',
+      {url: `http://localhost:3000/checklists`, method: 'GET',
         params
     },
       );
@@ -190,7 +190,7 @@ const checklistsControllerFindPaginatedByEmployeeParams = (
     params: ChecklistsControllerFindPaginatedByEmployeeParamsParams,
  ) => {
       return customInstance<CheckListForSpecificEmployee[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/checklists/by-employee`, method: 'GET',
+      {url: `http://localhost:3000/checklists/by-employee`, method: 'GET',
         params
     },
       );
@@ -200,7 +200,7 @@ const checklistsControllerUpdateCompanyId = (
     updateCompanyRelated: UpdateCompanyRelated,
  ) => {
       return customInstance<CheckListItem>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/checklists/update-company-related`, method: 'PUT',
+      {url: `http://localhost:3000/checklists/update-company-related`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateCompanyRelated
     },
@@ -211,7 +211,7 @@ const checklistsControllerUpdateExpiriesTime = (
     updateExpiriesTime: UpdateExpiriesTime,
  ) => {
       return customInstance<CheckList>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/checklists/update-expiries-time`, method: 'PUT',
+      {url: `http://localhost:3000/checklists/update-expiries-time`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateExpiriesTime
     },
@@ -222,7 +222,7 @@ const rolesControllerFindList = (
     
  ) => {
       return customInstance<Roles[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/roles`, method: 'GET'
+      {url: `http://localhost:3000/roles`, method: 'GET'
     },
       );
     }
@@ -231,7 +231,7 @@ const categoriesControllerFindList = (
     
  ) => {
       return customInstance<Categories[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/categories`, method: 'GET'
+      {url: `http://localhost:3000/categories`, method: 'GET'
     },
       );
     }
@@ -240,7 +240,7 @@ const categoriesControllerCreate = (
     createCategoriesDto: CreateCategoriesDto,
  ) => {
       return customInstance<Categories>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/categories`, method: 'POST',
+      {url: `http://localhost:3000/categories`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createCategoriesDto
     },
@@ -251,7 +251,7 @@ const questionsControllerFindList = (
     params: QuestionsControllerFindListParams,
  ) => {
       return customInstance<QuestionsWithChoices>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/questions`, method: 'GET',
+      {url: `http://localhost:3000/questions`, method: 'GET',
         params
     },
       );
@@ -261,7 +261,7 @@ const questionsControllerCreateQuestion = (
     questionDto: QuestionDto,
  ) => {
       return customInstance<Question>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/questions`, method: 'POST',
+      {url: `http://localhost:3000/questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: questionDto
     },
@@ -272,7 +272,7 @@ const questionsControllerFindAll = (
     
  ) => {
       return customInstance<QuestionsWithChoices>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/questions/findAll`, method: 'GET'
+      {url: `http://localhost:3000/questions/findAll`, method: 'GET'
     },
       );
     }
@@ -281,7 +281,7 @@ const answersControllerFindList = (
     
  ) => {
       return customInstance<Answers[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/answers`, method: 'GET'
+      {url: `http://localhost:3000/answers`, method: 'GET'
     },
       );
     }
@@ -290,7 +290,7 @@ const answersControllerCreate = (
     createAnswerDto: CreateAnswerDto,
  ) => {
       return customInstance<Answers>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/answers`, method: 'POST',
+      {url: `http://localhost:3000/answers`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createAnswerDto
     },
@@ -301,7 +301,7 @@ const answersControllerFindByQuestionId = (
     params: AnswersControllerFindByQuestionIdParams,
  ) => {
       return customInstance<Answers[]>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/answers/answers-question`, method: 'GET',
+      {url: `http://localhost:3000/answers/answers-question`, method: 'GET',
         params
     },
       );
@@ -311,7 +311,7 @@ const answersControllerCreateForImageQuestion = (
     createAnswerDto: CreateAnswerDto,
  ) => {
       return customInstance<Answers>(
-      {url: `https://88ad-2804-7f0-b380-8651-20ed-3a47-553b-7af2.ngrok-free.app/answers/answers-image-question`, method: 'POST',
+      {url: `http://localhost:3000/answers/answers-image-question`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createAnswerDto
     },
