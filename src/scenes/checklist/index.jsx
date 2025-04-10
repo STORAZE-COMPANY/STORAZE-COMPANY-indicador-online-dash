@@ -12,7 +12,6 @@ import { Delete, Edit, AddCircleOutline } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../../api/axios";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const ChecklistList = () => {
@@ -20,13 +19,15 @@ const ChecklistList = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const { checklistsControllerFindAll } = getIndicadorOnlineAPI();
-
+  const { checklistsControllerFindPaginatedByParams } = getIndicadorOnlineAPI();
 
   const fetchChecklists = async () => {
     try {
-      const data = await checklistsControllerFindAll(); 
-      console.log("data", data)
+      const data = await checklistsControllerFindPaginatedByParams({
+        limit: "10", 
+        page: "1",
+      });
+      console.log("checklists", data);
       setChecklists(data);
     } catch (err) {
       toast.error("Erro ao carregar checklists.");
@@ -41,7 +42,7 @@ const ChecklistList = () => {
 
   const handleDelete = (id) => {
     toast.success("Checklist removido!");
-    setChecklists((prev) => prev.filter((c) => c.id !== id));
+    setChecklists((prev) => prev.filter((c) => c.checklistItemId !== id));
   };
 
   const handleCreate = () => {
@@ -50,12 +51,7 @@ const ChecklistList = () => {
 
   return (
     <Box p={4} bgcolor="#141B2D" minHeight="100vh" color="#fff">
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" color="#7ec8f2">
           Checklists Criados
         </Typography>
@@ -86,23 +82,13 @@ const ChecklistList = () => {
       ) : (
         checklists.map((checklist) => (
           <Paper
-            key={checklist.id}
+            key={checklist.checklistItemId}
             elevation={3}
-            sx={{
-              backgroundColor: "#434957",
-              p: 2,
-              borderRadius: 3,
-              mb: 3,
-            }}
+            sx={{ backgroundColor: "#434957", p: 2, borderRadius: 3, mb: 3 }}
           >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={1}
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
               <Typography variant="h6" color="#fff">
-                {checklist.name}
+                {checklist.checklistName}
               </Typography>
               <Box>
                 <Tooltip title="Editar (em breve)">
@@ -111,7 +97,7 @@ const ChecklistList = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Excluir">
-                  <IconButton onClick={() => handleDelete(checklist.id)}>
+                  <IconButton onClick={() => handleDelete(checklist.checklistItemId)}>
                     <Delete sx={{ color: "#f44336" }} />
                   </IconButton>
                 </Tooltip>
@@ -121,7 +107,13 @@ const ChecklistList = () => {
             <Divider sx={{ backgroundColor: "#7ec8f2", mb: 1 }} />
 
             <Typography variant="body2" color="gray">
-              {checklist.categories?.length || 0} categoria(s)
+              Empresa: {checklist.companyName || "Não vinculada"}
+            </Typography>
+            <Typography variant="body2" color="gray">
+              Categoria ID: {checklist.categories_id}
+            </Typography>
+            <Typography variant="body2" color="gray">
+              Contém anomalias? {checklist.hasAnomalies ? "Sim" : "Não"}
             </Typography>
           </Paper>
         ))
