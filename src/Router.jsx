@@ -27,6 +27,7 @@ import Employees from "./scenes/employees/index.jsx";
 import CreateEmployees from "./scenes/employees/create-employees.jsx";
 import Category from "./scenes/categories/index.jsx";
 import CreateCategory from "./scenes/categories/create-category.jsx";
+import SettingsChecklist from "./scenes/checklist/settings-checklist.jsx";
 
 const AppRouter = () => {
   return (
@@ -56,6 +57,7 @@ const AppRouter = () => {
           <Route path="/employees" element={<Employees />} />
 
           <Route path="/checklists" element={<ChecklistList />} />
+          <Route path="/checklists/:id/settings" element={<SettingsChecklist />} />
           <Route path="/formresponse" element={<FormResponses />} />
           <Route path="/checklistform" element={<ChecklistForm />} />
 

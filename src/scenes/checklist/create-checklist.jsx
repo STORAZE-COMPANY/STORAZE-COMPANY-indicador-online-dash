@@ -1,4 +1,3 @@
-// ChecklistForm.jsx
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -178,27 +177,26 @@ const ChecklistForm = () => {
                   : [],
             })),
         }))
-        .filter((item) => item.question_list.length > 0); // garante que pelo menos 1 pergunta exista
-  
+        .filter((item) => item.question_list.length > 0); 
+
       if (!checklistName.trim()) {
         toast.error("O nome do checklist é obrigatório.");
         return;
       }
-  
+
       if (filteredChecklistItems.length === 0) {
         toast.error("Adicione pelo menos uma categoria com perguntas válidas.");
         return;
       }
-  
+
       const payload = {
         name: checklistName,
         checkListItem: filteredChecklistItems,
       };
-  
+
       await checklistsControllerCreate(payload);
       toast.success("Checklist publicado com sucesso!");
-  
-      // resetar campos
+
       setChecklistName("");
       setCategories([
         {
@@ -322,28 +320,28 @@ const ChecklistForm = () => {
               </FormControl>
 
               <FormControl fullWidth>
-                    <InputLabel sx={{ color: "#fff" }}>Posição</InputLabel>
-                    <Select
-                      value={q.position}
-                      onChange={(e) =>
-                        handleChangeQuestion(
-                          catIdx,
-                          qIdx,
-                          "position",
-                          e.target.value
-                        )
-                      }
-                      sx={{ backgroundColor: "#6E7484", color: "#fff" }}
-                    >
-                      {Array.from({
-                        length: categories[catIdx].questions.length,
-                      }).map((_, idx) => (
-                        <MenuItem key={idx + 1} value={idx + 1}>
-                          {idx + 1}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                <InputLabel sx={{ color: "#fff" }}>Posição</InputLabel>
+                <Select
+                  value={q.position}
+                  onChange={(e) =>
+                    handleChangeQuestion(
+                      catIdx,
+                      qIdx,
+                      "position",
+                      e.target.value
+                    )
+                  }
+                  sx={{ backgroundColor: "#6E7484", color: "#fff" }}
+                >
+                  {Array.from({
+                    length: categories[catIdx].questions.length,
+                  }).map((_, idx) => (
+                    <MenuItem key={idx + 1} value={idx + 1}>
+                      {idx + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
               <FormControlLabel
                 control={

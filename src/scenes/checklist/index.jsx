@@ -8,7 +8,12 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import { Delete, Edit, AddCircleOutline } from "@mui/icons-material";
+import {
+  Delete,
+  Edit,
+  AddCircleOutline,
+  SettingsOutlined,
+} from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -24,7 +29,7 @@ const ChecklistList = () => {
   const fetchChecklists = async () => {
     try {
       const data = await checklistsControllerFindPaginatedByParams({
-        limit: "10", 
+        limit: "10",
         page: "1",
       });
       console.log("checklists", data);
@@ -51,7 +56,12 @@ const ChecklistList = () => {
 
   return (
     <Box p={4} bgcolor="#141B2D" minHeight="100vh" color="#fff">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" color="#7ec8f2">
           Checklists Criados
         </Typography>
@@ -86,7 +96,12 @@ const ChecklistList = () => {
             elevation={3}
             sx={{ backgroundColor: "#434957", p: 2, borderRadius: 3, mb: 3 }}
           >
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={1}
+            >
               <Typography variant="h6" color="#fff">
                 {checklist.checklistName}
               </Typography>
@@ -96,8 +111,20 @@ const ChecklistList = () => {
                     <Edit sx={{ color: "#7ec8f2" }} />
                   </IconButton>
                 </Tooltip>
+                <Tooltip title="Configuração">
+                  <IconButton
+                    aria-label="settings"
+                    onClick={() => {
+                      navigate(`/checklists/${checklist.checklistItemId}/settings`);
+                    }}
+                  >
+                    <SettingsOutlined />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title="Excluir">
-                  <IconButton onClick={() => handleDelete(checklist.checklistItemId)}>
+                  <IconButton
+                    onClick={() => handleDelete(checklist.checklistItemId)}
+                  >
                     <Delete sx={{ color: "#f44336" }} />
                   </IconButton>
                 </Tooltip>
