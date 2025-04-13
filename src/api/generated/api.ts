@@ -8,10 +8,10 @@
 import type {
   AnswerChoice,
   AnswerResponse,
-  AnswerWithCheckList,
   Answers,
   AnswersControllerCreateForImageQuestionBody,
   AnswersControllerFindByQuestionIdParams,
+  AnswersWithQuestions,
   Categories,
   CheckList,
   CheckListForSpecificEmployee,
@@ -20,6 +20,7 @@ import type {
   ChecklistsControllerFindPaginatedByEmployeeParamsParams,
   ChecklistsControllerFindPaginatedByParamsParams,
   Company,
+  CompanyResponse,
   CreateAnswerChoice,
   CreateAnswerDto,
   CreateCategoriesDto,
@@ -27,11 +28,13 @@ import type {
   CreateCompanyDto,
   CreateEmployeeDto,
   CreateEmployeeResponse,
+  Employee,
   EmployeeListDto,
   EmployeesControllerFindListParams,
   LoginDto,
   Question,
   QuestionDto,
+  QuestionsControllerDeleteQuestionParams,
   QuestionsControllerFindListParams,
   QuestionsWithChoices,
   ResponseAuthDto,
@@ -39,9 +42,9 @@ import type {
   TokenDto,
   UpdateCompanyDto,
   UpdateCompanyRelated,
+  UpdateEmployeeDto,
   UpdateExpiriesTime,
-  UploadFileDto,
-  UploadImageResponseDto,
+  UpdateQuestion,
   UserAuth
 } from './api.schemas';
 
@@ -113,10 +116,21 @@ const companiesControllerFindAll = (
 const companiesControllerCreate = (
     createCompanyDto: CreateCompanyDto,
  ) => {
-      return customInstance<Company>(
+      return customInstance<CompanyResponse>(
       {url: `http://localhost:3000/companies`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createCompanyDto
+    },
+      );
+    }
+  
+const companiesControllerUpdate = (
+    updateCompanyDto: UpdateCompanyDto,
+ ) => {
+      return customInstance<CompanyResponse>(
+      {url: `http://localhost:3000/companies`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCompanyDto
     },
       );
     }
@@ -126,18 +140,6 @@ const companiesControllerFindOne = (
  ) => {
       return customInstance<Company>(
       {url: `http://localhost:3000/companies/${id}`, method: 'GET'
-    },
-      );
-    }
-  
-const companiesControllerUpdate = (
-    id: number,
-    updateCompanyDto: UpdateCompanyDto,
- ) => {
-      return customInstance<Company>(
-      {url: `http://localhost:3000/companies/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCompanyDto
     },
       );
     }
@@ -168,6 +170,17 @@ const employeesControllerFindList = (
       return customInstance<EmployeeListDto[]>(
       {url: `http://localhost:3000/employees`, method: 'GET',
         params
+    },
+      );
+    }
+  
+const employeesControllerUpdate = (
+    updateEmployeeDto: UpdateEmployeeDto,
+ ) => {
+      return customInstance<Employee>(
+      {url: `http://localhost:3000/employees`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateEmployeeDto
     },
       );
     }
@@ -275,6 +288,27 @@ const questionsControllerCreateQuestion = (
       );
     }
   
+const questionsControllerUpdateQuestion = (
+    updateQuestion: UpdateQuestion,
+ ) => {
+      return customInstance<Question>(
+      {url: `http://localhost:3000/questions`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateQuestion
+    },
+      );
+    }
+  
+const questionsControllerDeleteQuestion = (
+    params: QuestionsControllerDeleteQuestionParams,
+ ) => {
+      return customInstance<void>(
+      {url: `http://localhost:3000/questions`, method: 'DELETE',
+        params
+    },
+      );
+    }
+  
 const questionsControllerFindAll = (
     
  ) => {
@@ -349,26 +383,13 @@ const answersControllerCreateForMultipleQuestion = (
 const answersControllerFindAnswersWithCheckList = (
     
  ) => {
-      return customInstance<AnswerWithCheckList[]>(
+      return customInstance<AnswersWithQuestions[]>(
       {url: `http://localhost:3000/answers/answers-checklist`, method: 'GET'
     },
       );
     }
   
-const imagesControllerUploadFile = (
-    uploadFileDto: UploadFileDto,
- ) => {const formData = new FormData();
-formData.append('file', uploadFileDto.file)
-
-      return customInstance<UploadImageResponseDto>(
-      {url: `http://localhost:3000/images`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
-    },
-      );
-    }
-  
-return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindAll,companiesControllerCreate,companiesControllerFindOne,companiesControllerUpdate,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,imagesControllerUploadFile}};
+return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -381,11 +402,12 @@ export type AuthControllerRefreshTokenResult = NonNullable<Awaited<ReturnType<Re
 export type AuthControllerGetUserAuthResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerGetUserAuth']>>>
 export type CompaniesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindAll']>>>
 export type CompaniesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerCreate']>>>
-export type CompaniesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindOne']>>>
 export type CompaniesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerUpdate']>>>
+export type CompaniesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindOne']>>>
 export type CompaniesControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerRemove']>>>
 export type EmployeesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerCreate']>>>
 export type EmployeesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerFindList']>>>
+export type EmployeesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerUpdate']>>>
 export type ChecklistsControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerCreate']>>>
 export type ChecklistsControllerFindPaginatedByParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByParams']>>>
 export type ChecklistsControllerFindPaginatedByEmployeeParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByEmployeeParams']>>>
@@ -396,6 +418,8 @@ export type CategoriesControllerFindListResult = NonNullable<Awaited<ReturnType<
 export type CategoriesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['categoriesControllerCreate']>>>
 export type QuestionsControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerFindList']>>>
 export type QuestionsControllerCreateQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerCreateQuestion']>>>
+export type QuestionsControllerUpdateQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerUpdateQuestion']>>>
+export type QuestionsControllerDeleteQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerDeleteQuestion']>>>
 export type QuestionsControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['questionsControllerFindAll']>>>
 export type AnswersControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerFindList']>>>
 export type AnswersControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreate']>>>
@@ -403,4 +427,3 @@ export type AnswersControllerFindByQuestionIdResult = NonNullable<Awaited<Return
 export type AnswersControllerCreateForImageQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreateForImageQuestion']>>>
 export type AnswersControllerCreateForMultipleQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreateForMultipleQuestion']>>>
 export type AnswersControllerFindAnswersWithCheckListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerFindAnswersWithCheckList']>>>
-export type ImagesControllerUploadFileResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['imagesControllerUploadFile']>>>

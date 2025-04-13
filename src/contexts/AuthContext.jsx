@@ -9,10 +9,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(checkAuth());
+  const [dataAuth, setDataAuth] = useState({});
 
-  const login = ({ access_token, refresh_token }) => {
+  const login = ({ access_token, refresh_token, ...rest }) => {
     storeToken({ access_token, refresh_token });
     setAuth(true);
+    setDataAuth(rest);
   };
 
   const logout = () => {
@@ -25,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, dataAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -45,11 +45,11 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: "nome", label: "Nome do Checklist" },
-  { id: "data", label: "Data" },
-  { id: "empresa", label: "Empresa" },
-  { id: "colaborador", label: "Colaborador" },
-  { id: "anomalia", label: "Anomalia" },
+  { id: "question", label: "Questão" },
+  { id: "created_at", label: "Data" },
+  { id: "companyName", label: "Empresa" },
+  { id: "employeeName", label: "Colaborador" },
+  { id: "hasAnomaly", label: "Anomalia" },
 ];
 
 const FormResponses = () => {
@@ -57,7 +57,7 @@ const FormResponses = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("nome");
+  const [orderBy, setOrderBy] = useState("question");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(14);
 
@@ -66,25 +66,10 @@ const FormResponses = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Chama o endpoint e armazena o response completo
         const responses = await answersControllerFindAnswersWithCheckList();
-
-        const grouped = responses.reduce((acc, answer) => {
-          const key = `${answer.question_id}-${answer.employee_id}`;
-          console.log("answer", answer)
-          if (!acc[key]) {
-            acc[key] = {
-              id: answer.id,
-              nome: answer.checklistName || "Checklist",
-              data: answer.created_at || new Date().toISOString(),
-              empresa: answer?.CompanyName || "-",
-              colaborador: answer?.EmployeeName || "-",
-              anomalia: answer.hasAnomaly,
-            };
-          }
-          return acc;
-        }, {});
-
-        setData(Object.values(grouped));
+        console.log("responses", responses)
+        setData(responses);
       } catch (err) {
         console.error("Erro ao carregar dados:", err);
       } finally {
@@ -108,14 +93,14 @@ const FormResponses = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["ID", "Nome", "Data", "Empresa", "Colaborador", "Anomalia"];
+    const headers = ["ID", "Questão", "Data", "Empresa", "Colaborador", "Anomalia"];
     const rows = data.map((r) => [
       r.id,
-      r.nome,
-      new Date(r.data).toLocaleDateString(),
-      r.empresa,
-      r.colaborador,
-      r.anomalia ? "Sim" : "Não",
+      r.question,
+      new Date(r.created_at).toLocaleDateString(),
+      r.companyName,
+      r.employeeName,
+      r.hasAnomaly ? "Sim" : "Não",
     ]);
     const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -186,16 +171,16 @@ const FormResponses = () => {
                       backgroundColor: idx % 2 === 0 ? "#2A3142" : "#1E2533",
                       cursor: "pointer",
                     }}
-                    onClick={() => navigate(`/checklist/${row.id}`)}
+                    onClick={() => navigate(`/checklist/${row.id}`, { state: row })}
                   >
-                    <TableCell sx={{ color: "white" }}>{row.nome}</TableCell>
+                    <TableCell sx={{ color: "white" }}>{row.question}</TableCell>
                     <TableCell sx={{ color: "white" }}>
-                      {new Date(row.data).toLocaleDateString()}
+                      {new Date(row.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>{row.empresa}</TableCell>
-                    <TableCell sx={{ color: "white" }}>{row.colaborador}</TableCell>
+                    <TableCell sx={{ color: "white" }}>{row.companyName}</TableCell>
+                    <TableCell sx={{ color: "white" }}>{row.employeeName}</TableCell>
                     <TableCell>
-                      {row.anomalia ? (
+                      {row.hasAnomaly ? (
                         <Error sx={{ color: "#E74C3C" }} />
                       ) : (
                         <CheckCircle sx={{ color: "#2ECC71" }} />

@@ -18,22 +18,183 @@ import {
   ReceiptOutlined,
   TimelineOutlined,
   WavesOutlined,
+  DonutLargeOutlined,
 } from "@mui/icons-material";
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined";
 import avatar from "../../../assets/images/fabio-vivas.jpeg";
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import logo from "../../../assets/images/logo-cliente.jpeg";
 import Item from "./Item";
-import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import { ToggledContext } from "../../../App";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const SideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { toggled, setToggled } = useContext(ToggledContext);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const { auth, dataAuth } = useAuth();
+
+  const userRole = dataAuth?.user?.role;
+
+
+  let menuItems = [];
+  if (userRole === "superAdmin") {
+    menuItems = [
+      {
+        title: "Gerenciar Categorias",
+        path: "/category",
+        icon: <CheckOutlinedIcon />,
+      },
+      {
+        title: "Gerenciar CheckList",
+        path: "/checklists",
+        icon: <ChecklistOutlined />,
+      },
+      {
+        title: "Gerenciar empresa",
+        path: "/company",
+        icon: <ApartmentOutlined />,
+      },
+      {
+        title: "Gerenciar funcionários",
+        path: "/employees",
+        icon: <BadgeOutlinedIcon />,
+      },
+      {
+        title: "Gerenciar Respostas",
+        path: "/formresponse",
+        icon: <ManageSearchOutlinedIcon />,
+      },
+      { title: "Gerenciar equipe", path: "/team", icon: <PeopleAltOutlined /> },
+      {
+        title: "Criar usuário",
+        path: "/createEmployee",
+        icon: <PersonOutlined />,
+      },
+    ];
+  } else if (userRole === "Admin") {
+    menuItems = [
+      {
+        title: "Gerenciar Respostas",
+        path: "/formresponse",
+        icon: <ManageSearchOutlinedIcon />,
+      },
+      { title: "Gerenciar equipe", path: "/team", icon: <PeopleAltOutlined /> },
+    ];
+  } else if (userRole === "User") {
+    menuItems = []; 
+  }
+
   return (
-    <Sidebar
+    <>
+      <Sidebar
+        backgroundColor={colors.primary[400]}
+        rootStyles={{
+          border: 0,
+          height: "100%",
+        }}
+        collapsed={collapsed}
+        onBackdropClick={() => setToggled(false)}
+        toggled={toggled}
+        breakPoint="md"
+      >
+        <Menu
+          menuItemStyles={{
+            button: { ":hover": { background: "transparent" } },
+          }}
+        >
+          <MenuItem
+            rootStyles={{
+              margin: "10px 0 20px 0",
+              color: colors.gray[100],
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              {!collapsed && (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap="12px"
+                  sx={{ transition: ".3s ease" }}
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    textTransform="capitalize"
+                    color={colors.greenAccent[500]}
+                  >
+                    Indicador Online
+                  </Typography>
+                </Box>
+              )}
+              <IconButton onClick={() => setCollapsed(!collapsed)}>
+                <MenuOutlined />
+              </IconButton>
+            </Box>
+          </MenuItem>
+        </Menu>
+
+        {!collapsed && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "10px",
+              mb: "25px",
+            }}
+          >
+            <Avatar
+              alt="avatar"
+              src={logo}
+              sx={{ width: "100px", height: "100px" }}
+            />
+          </Box>
+        )}
+
+        <Box mb={5} pl={collapsed ? undefined : "5%"}>
+          {menuItems.length > 0 ? (
+            <Menu
+              menuItemStyles={{
+                button: {
+                  ":hover": {
+                    color: "#868dfb",
+                    background: "transparent",
+                    transition: ".4s ease",
+                  },
+                },
+              }}
+            >
+              {menuItems.map((item, index) => (
+                <Item
+                  key={index}
+                  title={item.title}
+                  path={item.path}
+                  colors={colors}
+                  icon={item.icon}
+                />
+              ))}
+            </Menu>
+          ) : (
+            <Typography
+              variant="h6"
+              sx={{ m: "15px 0 5px 20px", color: colors.gray[300] }}
+            >
+              Você não tem permissão para visualizar itens.
+            </Typography>
+          )}
+        </Box>
+      </Sidebar>
+      {/*    <Sidebar
       backgroundColor={colors.primary[400]}
       rootStyles={{
         border: 0,
@@ -69,11 +230,11 @@ const SideBar = () => {
                 gap="12px"
                 sx={{ transition: ".3s ease" }}
               >
-                {/*     <img
+                  <img
                   style={{ width: "35px", height: "35px", borderRadius: "8px" }}
                   src={logo}
                   alt="Argon"
-                />  */}
+                /> 
                 <Typography
                   variant="h4"
                   fontWeight="bold"
@@ -105,7 +266,7 @@ const SideBar = () => {
             src={logo}
             sx={{ width: "100px", height: "100px" }}
           />
-          {/*     <Box sx={{ textAlign: "center" }}>
+             <Box sx={{ textAlign: "center" }}>
             <Typography variant="h3" fontWeight="bold" color={colors.gray[100]}>
               Fabio
             </Typography>
@@ -116,12 +277,12 @@ const SideBar = () => {
             >
               Admin
             </Typography>
-          </Box> */}
+          </Box> 
         </Box>
       )}
 
       <Box mb={5} pl={collapsed ? undefined : "5%"}>
-        {/*  <Menu
+        <Menu
           menuItemStyles={{
             button: {
               ":hover": {
@@ -138,14 +299,14 @@ const SideBar = () => {
             colors={colors}
             icon={<DashboardOutlined />}
           />
-        </Menu>  */}
-        {/*  <Typography
+        </Menu>  
+         <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
         >
           {!collapsed ? "Data" : " "}
-        </Typography>{" "} */}
+        </Typography>{" "} 
         <Menu
           menuItemStyles={{
             button: {
@@ -200,7 +361,7 @@ const SideBar = () => {
             colors={colors}
             icon={<PersonOutlined />}
           />
-          {/*  <Item
+          <Item
             title="Contacts Information"
             path="/contacts"
             colors={colors}
@@ -211,16 +372,16 @@ const SideBar = () => {
             path="/invoices"
             colors={colors}
             icon={<ReceiptOutlined />}
-          /> */}
+          /> 
         </Menu>
-        {/*    <Typography
+          <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
         >
           {!collapsed ? "Pages" : " "}
-        </Typography> */}
-        {/*     <Menu
+        </Typography> 
+           <Menu
           menuItemStyles={{
             button: {
               ":hover": {
@@ -249,8 +410,8 @@ const SideBar = () => {
             colors={colors}
             icon={<HelpOutlineOutlined />}
           /> 
-        </Menu> */}
-        {/*  <Typography
+        </Menu> 
+         <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
@@ -298,9 +459,10 @@ const SideBar = () => {
             colors={colors}
             icon={<WavesOutlined />}
           />
-        </Menu>   */}
+        </Menu>   
       </Box>
-    </Sidebar>
+    </Sidebar> */}
+    </>
   );
 };
 

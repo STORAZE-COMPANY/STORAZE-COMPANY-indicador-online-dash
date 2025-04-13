@@ -18,21 +18,22 @@ import {
 import type {
   AnswerChoice,
   AnswerResponse,
-  AnswerWithCheckList,
   Answers,
+  AnswersWithQuestions,
   Categories,
   CheckList,
   CheckListForSpecificEmployee,
   CheckListItem,
   CheckListItemFormattedList,
   Company,
+  CompanyResponse,
   CreateEmployeeResponse,
+  Employee,
   EmployeeListDto,
   Question,
   QuestionsWithChoices,
   ResponseAuthDto,
   Roles,
-  UploadImageResponseDto,
   UserAuth
 } from './api.schemas';
 
@@ -47,15 +48,17 @@ export const getAuthControllerGetUserAuthResponseMock = (overrideResponse: Parti
 
 export const getCompaniesControllerFindAllResponseMock = (): Company[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20)})))
 
-export const getCompaniesControllerCreateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
+export const getCompaniesControllerCreateResponseMock = (overrideResponse: Partial< CompanyResponse > = {}): CompanyResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), ...overrideResponse})
+
+export const getCompaniesControllerUpdateResponseMock = (overrideResponse: Partial< CompanyResponse > = {}): CompanyResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), ...overrideResponse})
 
 export const getCompaniesControllerFindOneResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
-
-export const getCompaniesControllerUpdateResponseMock = (overrideResponse: Partial< Company > = {}): Company => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20), ...overrideResponse})
 
 export const getEmployeesControllerCreateResponseMock = (overrideResponse: Partial< CreateEmployeeResponse > = {}): CreateEmployeeResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), phone: faker.string.alpha(20), ...overrideResponse})
 
 export const getEmployeesControllerFindListResponseMock = (): EmployeeListDto[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), phone: faker.string.alpha(20), company_name: faker.string.alpha(20), role_name: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined})})))
+
+export const getEmployeesControllerUpdateResponseMock = (overrideResponse: Partial< Employee > = {}): Employee => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), phone: faker.string.alpha(20), company_id: faker.number.int({min: undefined, max: undefined}), password: faker.string.alpha(20), role_id: faker.string.alpha(20), questionId: faker.string.alpha(20), isActive: faker.datatype.boolean(), ...overrideResponse})
 
 export const getChecklistsControllerCreateResponseMock = (overrideResponse: Partial< CheckList > = {}): CheckList => ({id: faker.string.alpha(20), name: faker.string.alpha(20), expiries_in: `${faker.date.past().toISOString().split('.')[0]}Z`, images_expiries_in: `${faker.date.past().toISOString().split('.')[0]}Z`, created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
 
@@ -77,6 +80,8 @@ export const getQuestionsControllerFindListResponseMock = (overrideResponse: Par
 
 export const getQuestionsControllerCreateQuestionResponseMock = (overrideResponse: Partial< Question > = {}): Question => ({...overrideResponse})
 
+export const getQuestionsControllerUpdateQuestionResponseMock = (overrideResponse: Partial< Question > = {}): Question => ({...overrideResponse})
+
 export const getQuestionsControllerFindAllResponseMock = (overrideResponse: Partial< QuestionsWithChoices > = {}): QuestionsWithChoices => ({id: faker.string.alpha(20), question: faker.string.alpha(20), type: faker.helpers.arrayElement(['Upload de arquivo','Múltipla escolha','Texto'] as const), isRequired: faker.datatype.boolean(), checkListItem_id: faker.string.alpha(20), IAPrompt: faker.helpers.arrayElement([faker.string.alpha(20), null]), choices: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), choice: faker.string.alpha(20), anomalyStatus: faker.helpers.arrayElement(['ANOMALIA','ANOMALIA_RESTRITIVA'] as const), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, question_id: faker.string.alpha(20), updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`})), undefined]), ...overrideResponse})
 
 export const getAnswersControllerFindListResponseMock = (): Answers[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), textAnswer: faker.helpers.arrayElement([faker.string.alpha(20), undefined]), imageAnswer: faker.helpers.arrayElement([faker.string.alpha(20), undefined]), question_id: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), anomalyStatus: faker.string.alpha(20)})))
@@ -89,9 +94,7 @@ export const getAnswersControllerCreateForImageQuestionResponseMock = (overrideR
 
 export const getAnswersControllerCreateForMultipleQuestionResponseMock = (overrideResponse: Partial< AnswerChoice > = {}): AnswerChoice => ({id: faker.string.alpha(20), choice_id: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
 
-export const getAnswersControllerFindAnswersWithCheckListResponseMock = (): AnswerWithCheckList[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), textAnswer: faker.helpers.arrayElement([faker.string.alpha(20), undefined]), imageAnswer: faker.helpers.arrayElement([faker.string.alpha(20), undefined]), question_id: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), anomalyStatus: faker.string.alpha(20), hasAnomaly: faker.datatype.boolean(), companyName: faker.string.alpha(20), employeeName: faker.string.alpha(20)})))
-
-export const getImagesControllerUploadFileResponseMock = (overrideResponse: Partial< UploadImageResponseDto > = {}): UploadImageResponseDto => ({message: faker.string.alpha(20), url: faker.string.alpha(20), ...overrideResponse})
+export const getAnswersControllerFindAnswersWithCheckListResponseMock = (): AnswersWithQuestions[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), question: faker.string.alpha(20), answer: faker.string.alpha(20), question_id: faker.string.alpha(20), companyName: faker.string.alpha(20), employeeName: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), anomalyStatus: faker.helpers.arrayElement(['ANOMALIA','ANOMALIA_RESTRITIVA'] as const), hasAnomaly: faker.datatype.boolean()})))
 
 
 export const getAppControllerGetHelloMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
@@ -164,7 +167,7 @@ export const getCompaniesControllerFindAllMockHandler = (overrideResponse?: Comp
   })
 }
 
-export const getCompaniesControllerCreateMockHandler = (overrideResponse?: Company | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Company> | Company)) => {
+export const getCompaniesControllerCreateMockHandler = (overrideResponse?: CompanyResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CompanyResponse> | CompanyResponse)) => {
   return http.post('*/companies', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -176,24 +179,24 @@ export const getCompaniesControllerCreateMockHandler = (overrideResponse?: Compa
   })
 }
 
-export const getCompaniesControllerFindOneMockHandler = (overrideResponse?: Company | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Company> | Company)) => {
-  return http.get('*/companies/:id', async (info) => {await delay(1000);
+export const getCompaniesControllerUpdateMockHandler = (overrideResponse?: CompanyResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<CompanyResponse> | CompanyResponse)) => {
+  return http.put('*/companies', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getCompaniesControllerFindOneResponseMock()),
+            : getCompaniesControllerUpdateResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
   })
 }
 
-export const getCompaniesControllerUpdateMockHandler = (overrideResponse?: Company | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Company> | Company)) => {
-  return http.put('*/companies/:id', async (info) => {await delay(1000);
+export const getCompaniesControllerFindOneMockHandler = (overrideResponse?: Company | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Company> | Company)) => {
+  return http.get('*/companies/:id', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getCompaniesControllerUpdateResponseMock()),
+            : getCompaniesControllerFindOneResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -228,6 +231,18 @@ export const getEmployeesControllerFindListMockHandler = (overrideResponse?: Emp
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
             : getEmployeesControllerFindListResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getEmployeesControllerUpdateMockHandler = (overrideResponse?: Employee | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Employee> | Employee)) => {
+  return http.put('*/employees', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getEmployeesControllerUpdateResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -354,6 +369,28 @@ export const getQuestionsControllerCreateQuestionMockHandler = (overrideResponse
   })
 }
 
+export const getQuestionsControllerUpdateQuestionMockHandler = (overrideResponse?: Question | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Question> | Question)) => {
+  return http.put('*/questions', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getQuestionsControllerUpdateQuestionResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getQuestionsControllerDeleteQuestionMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void)) => {
+  return http.delete('*/questions', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
+      { status: 200,
+        
+      })
+  })
+}
+
 export const getQuestionsControllerFindAllMockHandler = (overrideResponse?: QuestionsWithChoices | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<QuestionsWithChoices> | QuestionsWithChoices)) => {
   return http.get('*/questions/findAll', async (info) => {await delay(1000);
   
@@ -426,25 +463,13 @@ export const getAnswersControllerCreateForMultipleQuestionMockHandler = (overrid
   })
 }
 
-export const getAnswersControllerFindAnswersWithCheckListMockHandler = (overrideResponse?: AnswerWithCheckList[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AnswerWithCheckList[]> | AnswerWithCheckList[])) => {
+export const getAnswersControllerFindAnswersWithCheckListMockHandler = (overrideResponse?: AnswersWithQuestions[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AnswersWithQuestions[]> | AnswersWithQuestions[])) => {
   return http.get('*/answers/answers-checklist', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
             : getAnswersControllerFindAnswersWithCheckListResponseMock()),
       { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  })
-}
-
-export const getImagesControllerUploadFileMockHandler = (overrideResponse?: UploadImageResponseDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UploadImageResponseDto> | UploadImageResponseDto)) => {
-  return http.post('*/images', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getImagesControllerUploadFileResponseMock()),
-      { status: 201,
         headers: { 'Content-Type': 'application/json' }
       })
   })
@@ -457,11 +482,12 @@ export const getIndicadorOnlineAPIMock = () => [
   getAuthControllerGetUserAuthMockHandler(),
   getCompaniesControllerFindAllMockHandler(),
   getCompaniesControllerCreateMockHandler(),
-  getCompaniesControllerFindOneMockHandler(),
   getCompaniesControllerUpdateMockHandler(),
+  getCompaniesControllerFindOneMockHandler(),
   getCompaniesControllerRemoveMockHandler(),
   getEmployeesControllerCreateMockHandler(),
   getEmployeesControllerFindListMockHandler(),
+  getEmployeesControllerUpdateMockHandler(),
   getChecklistsControllerCreateMockHandler(),
   getChecklistsControllerFindPaginatedByParamsMockHandler(),
   getChecklistsControllerFindPaginatedByEmployeeParamsMockHandler(),
@@ -472,11 +498,12 @@ export const getIndicadorOnlineAPIMock = () => [
   getCategoriesControllerCreateMockHandler(),
   getQuestionsControllerFindListMockHandler(),
   getQuestionsControllerCreateQuestionMockHandler(),
+  getQuestionsControllerUpdateQuestionMockHandler(),
+  getQuestionsControllerDeleteQuestionMockHandler(),
   getQuestionsControllerFindAllMockHandler(),
   getAnswersControllerFindListMockHandler(),
   getAnswersControllerCreateMockHandler(),
   getAnswersControllerFindByQuestionIdMockHandler(),
   getAnswersControllerCreateForImageQuestionMockHandler(),
   getAnswersControllerCreateForMultipleQuestionMockHandler(),
-  getAnswersControllerFindAnswersWithCheckListMockHandler(),
-  getImagesControllerUploadFileMockHandler()]
+  getAnswersControllerFindAnswersWithCheckListMockHandler()]

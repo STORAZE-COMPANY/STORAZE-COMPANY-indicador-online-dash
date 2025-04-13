@@ -30,12 +30,12 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const { access_token, refresh_token } = await authControllerLoginDashboard({
+      const { access_token, refresh_token, ...rest } = await authControllerLoginDashboard({
         email,
         password,
       });
   
-      login({ access_token, refresh_token });
+      login({ access_token, refresh_token , ...rest  });
   
       navigate("/checklists");
     } catch (error) {

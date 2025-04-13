@@ -78,17 +78,40 @@ export interface CreateCompanyDto {
   roleId: string;
 }
 
+export interface CompanyResponse {
+  /** ID da empresa */
+  id: number;
+  /** Nome da empresa */
+  name: string;
+  /** Email da empresa */
+  email: string;
+  /** CNPJ da empresa */
+  cnpj: string;
+  /** Se a empresa está ativa */
+  isActive: boolean;
+  /** Data de criação da empresa */
+  created_at?: string;
+  /** Última atualização da empresa */
+  updated_at?: string;
+  /** Id do Nível de acesso da empresa */
+  role_id: string;
+}
+
 export interface ConflictException { [key: string]: unknown }
 
 export interface UpdateCompanyDto {
+  /** ID da empresa */
+  id: number;
   /** Nome da empresa */
   name: string;
   /** CNPJ da empresa */
   cnpj: string;
   /** Se a empresa está ativa ou não */
   isActive: boolean;
-  /** IDs dos checklists associados à empresa */
-  checklistIds: number[];
+  /** Email da empresa */
+  email: string;
+  /** ID do nível de acesso associada à empresa */
+  roleId: string;
 }
 
 export interface CreateEmployeeDto {
@@ -132,6 +155,44 @@ export interface EmployeeListDto {
   role_name: string;
   /** ID da empresa do funcionário */
   company_id: number;
+}
+
+export interface UpdateEmployeeDto {
+  /** Id do funcionário */
+  id: number;
+  /** Nome do funcionário */
+  name?: string;
+  /** Email do funcionário */
+  email?: string;
+  /** Telefone do funcionário */
+  phone?: string;
+  /** ID da empresa do funcionário */
+  company_id?: number;
+  /** Id do nível do funcionário */
+  role_id?: string;
+  /** Status do funcionário */
+  isActive?: boolean;
+}
+
+export interface Employee {
+  /** Id do funcionário */
+  id: number;
+  /** Nome do funcionário */
+  name: string;
+  /** Email do funcionário */
+  email: string;
+  /** Telefone do funcionário */
+  phone: string;
+  /** ID da empresa do funcionário */
+  company_id: number;
+  /** Senha do funcionário */
+  password: string;
+  /** Id do nível do funcionário */
+  role_id: string;
+  /** Id do nível do funcionário */
+  questionId: string;
+  /** Status do funcionário */
+  isActive: boolean;
 }
 
 /**
@@ -403,6 +464,25 @@ export interface Question { [key: string]: unknown }
 
 export interface UnprocessableEntityException { [key: string]: unknown }
 
+export interface UpdateQuestion {
+  /** id */
+  questionId: string;
+  /** question */
+  question?: string;
+  /** type */
+  type?: string;
+  /** employee_id */
+  employee_id?: number;
+  /** isRequired */
+  isRequired?: boolean;
+  /** checkListItem_id */
+  checkListItem_id?: string;
+  /** IAPrompt */
+  IAPrompt?: string;
+  /** answerType */
+  answerType?: string;
+}
+
 export interface Answers {
   /** id */
   id: string;
@@ -464,36 +544,41 @@ export interface AnswerChoice {
   updated_at: string;
 }
 
-export interface AnswerWithCheckList {
+/**
+ * anomalyStatus
+ */
+export type AnswersWithQuestionsAnomalyStatus = typeof AnswersWithQuestionsAnomalyStatus[keyof typeof AnswersWithQuestionsAnomalyStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AnswersWithQuestionsAnomalyStatus = {
+  ANOMALIA: 'ANOMALIA',
+  ANOMALIA_RESTRITIVA: 'ANOMALIA_RESTRITIVA',
+} as const;
+
+export interface AnswersWithQuestions {
   /** id */
   id: string;
-  /** textAnswer */
-  textAnswer?: string;
-  /** imageAnswer */
-  imageAnswer?: string;
+  /** Questão vinculada a resposta */
+  question: string;
+  /** Resposta da pergunta */
+  answer: string;
   /** question_id */
   question_id: string;
-  /** employee_id */
-  employee_id: number;
-  /** anomalyStatus */
-  anomalyStatus: string;
-  /** Se teve anomalia na resposta ou não */
-  hasAnomaly: boolean;
   /** Nome da empresa vinculada a quem respondeu */
   companyName: string;
   /** Nome do empregado que respondeu */
   employeeName: string;
-}
-
-export interface UploadFileDto {
-  file: Blob;
-}
-
-export interface UploadImageResponseDto {
-  /** Upload feito com sucesso */
-  message: string;
-  /** URL do arquivo */
-  url: string;
+  /** Data de criação da resposta */
+  created_at: string;
+  /** Data de atualização da resposta */
+  updated_at: string;
+  /** employee_id */
+  employee_id: number;
+  /** anomalyStatus */
+  anomalyStatus: AnswersWithQuestionsAnomalyStatus;
+  /** Se teve anomalia na resposta ou não */
+  hasAnomaly: boolean;
 }
 
 export type EmployeesControllerFindListParams = {
@@ -551,6 +636,10 @@ limit: string;
  * Página de registros
  */
 page: string;
+};
+
+export type QuestionsControllerDeleteQuestionParams = {
+questionId: string;
 };
 
 export type AnswersControllerFindByQuestionIdParams = {
