@@ -6,10 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  AnomalyResolution,
   AnswerChoice,
   AnswerResponse,
   Answers,
   AnswersControllerCreateForImageQuestionBody,
+  AnswersControllerFindAnomalyResolutionByIdParams,
+  AnswersControllerFindAnswersWithCheckListParams,
   AnswersControllerFindByQuestionIdParams,
   AnswersWithQuestions,
   Categories,
@@ -21,6 +24,7 @@ import type {
   ChecklistsControllerFindPaginatedByParamsParams,
   Company,
   CompanyResponse,
+  CreateAnomalyResolutionDTO,
   CreateAnswerChoice,
   CreateAnswerDto,
   CreateCategoriesDto,
@@ -31,6 +35,7 @@ import type {
   Employee,
   EmployeeListDto,
   EmployeesControllerFindListParams,
+  FindCompanySettings,
   LoginDto,
   Question,
   QuestionDto,
@@ -40,8 +45,10 @@ import type {
   ResponseAuthDto,
   Roles,
   TokenDto,
+  UpdateAnomalyResolutionDTO,
   UpdateCompanyDto,
   UpdateCompanyRelated,
+  UpdateCompanySettingsDto,
   UpdateEmployeeDto,
   UpdateExpiriesTime,
   UpdateQuestion,
@@ -100,6 +107,26 @@ const authControllerGetUserAuth = (
  ) => {
       return customInstance<UserAuth>(
       {url: `http://localhost:3000/auth/userAuth`, method: 'GET'
+    },
+      );
+    }
+  
+const companiesControllerFindSettings = (
+    
+ ) => {
+      return customInstance<FindCompanySettings[]>(
+      {url: `http://localhost:3000/companies/settings`, method: 'GET'
+    },
+      );
+    }
+  
+const companiesControllerUpdateCompanySettings = (
+    updateCompanySettingsDto: UpdateCompanySettingsDto,
+ ) => {
+      return customInstance<CompanyResponse>(
+      {url: `http://localhost:3000/companies/settings`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCompanySettingsDto
     },
       );
     }
@@ -381,15 +408,57 @@ const answersControllerCreateForMultipleQuestion = (
     }
   
 const answersControllerFindAnswersWithCheckList = (
-    
+    params: AnswersControllerFindAnswersWithCheckListParams,
  ) => {
       return customInstance<AnswersWithQuestions[]>(
-      {url: `http://localhost:3000/answers/answers-checklist`, method: 'GET'
+      {url: `http://localhost:3000/answers/answers-checklist`, method: 'GET',
+        params
     },
       );
     }
   
-return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList}};
+const answersControllerCreateAnomalyResolution = (
+    createAnomalyResolutionDTO: CreateAnomalyResolutionDTO,
+ ) => {
+      return customInstance<AnomalyResolution>(
+      {url: `http://localhost:3000/answers/answers-anomaly-resolution`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAnomalyResolutionDTO
+    },
+      );
+    }
+  
+const answersControllerUpdateAnomalyResolution = (
+    updateAnomalyResolutionDTO: UpdateAnomalyResolutionDTO,
+ ) => {
+      return customInstance<AnomalyResolution>(
+      {url: `http://localhost:3000/answers/answers-anomaly-resolution-update`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAnomalyResolutionDTO
+    },
+      );
+    }
+  
+const answersControllerFindAnomalyResolutionById = (
+    params: AnswersControllerFindAnomalyResolutionByIdParams,
+ ) => {
+      return customInstance<AnomalyResolution>(
+      {url: `http://localhost:3000/answers/answers-anomaly-resolution-answer-id`, method: 'GET',
+        params
+    },
+      );
+    }
+  
+const answersControllerFindAnomalyResolutionList = (
+    
+ ) => {
+      return customInstance<AnomalyResolution[]>(
+      {url: `http://localhost:3000/answers/answers-anomaly-resolution-get`, method: 'GET'
+    },
+      );
+    }
+  
+return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindSettings,companiesControllerUpdateCompanySettings,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,answersControllerCreateAnomalyResolution,answersControllerUpdateAnomalyResolution,answersControllerFindAnomalyResolutionById,answersControllerFindAnomalyResolutionList}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -400,6 +469,8 @@ export type AuthControllerLoginDashboardResult = NonNullable<Awaited<ReturnType<
 export type AuthControllerLoginMobileResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerLoginMobile']>>>
 export type AuthControllerRefreshTokenResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerRefreshToken']>>>
 export type AuthControllerGetUserAuthResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['authControllerGetUserAuth']>>>
+export type CompaniesControllerFindSettingsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindSettings']>>>
+export type CompaniesControllerUpdateCompanySettingsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerUpdateCompanySettings']>>>
 export type CompaniesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerFindAll']>>>
 export type CompaniesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerCreate']>>>
 export type CompaniesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['companiesControllerUpdate']>>>
@@ -427,3 +498,7 @@ export type AnswersControllerFindByQuestionIdResult = NonNullable<Awaited<Return
 export type AnswersControllerCreateForImageQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreateForImageQuestion']>>>
 export type AnswersControllerCreateForMultipleQuestionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreateForMultipleQuestion']>>>
 export type AnswersControllerFindAnswersWithCheckListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerFindAnswersWithCheckList']>>>
+export type AnswersControllerCreateAnomalyResolutionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerCreateAnomalyResolution']>>>
+export type AnswersControllerUpdateAnomalyResolutionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerUpdateAnomalyResolution']>>>
+export type AnswersControllerFindAnomalyResolutionByIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerFindAnomalyResolutionById']>>>
+export type AnswersControllerFindAnomalyResolutionListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['answersControllerFindAnomalyResolutionList']>>>

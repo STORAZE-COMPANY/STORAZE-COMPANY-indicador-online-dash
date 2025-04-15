@@ -21,9 +21,6 @@ const Category = () => {
       try {
         const response = await categoriesControllerFindList();
 
-        console.log("response",response);
-        
-
         const formatted = response?.map((cat) => ({
           id: cat.id,
           nome: cat.name,

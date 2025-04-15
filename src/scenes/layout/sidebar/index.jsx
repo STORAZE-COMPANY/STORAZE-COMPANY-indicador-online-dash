@@ -39,7 +39,6 @@ const SideBar = () => {
 
   const userRole = dataAuth?.user?.role;
 
-
   let menuItems = [];
   if (userRole === "superAdmin") {
     menuItems = [
@@ -68,12 +67,12 @@ const SideBar = () => {
         path: "/formresponse",
         icon: <ManageSearchOutlinedIcon />,
       },
-      { title: "Gerenciar equipe", path: "/team", icon: <PeopleAltOutlined /> },
+     /*  { title: "Gerenciar equipe", path: "/team", icon: <PeopleAltOutlined /> },
       {
         title: "Criar usuário",
         path: "/createEmployee",
         icon: <PersonOutlined />,
-      },
+      }, */
     ];
   } else if (userRole === "Admin") {
     menuItems = [
@@ -85,7 +84,7 @@ const SideBar = () => {
       { title: "Gerenciar equipe", path: "/team", icon: <PeopleAltOutlined /> },
     ];
   } else if (userRole === "User") {
-    menuItems = []; 
+    menuItems = [];
   }
 
   return (
@@ -174,6 +173,13 @@ const SideBar = () => {
                 },
               }}
             >
+              <Typography
+                variant="h6"
+                color={colors.gray[300]}
+                sx={{ m: "15px 0 5px 20px" }}
+              >
+                {!collapsed ? "Serviços disponíveis:" : " "}
+              </Typography>
               {menuItems.map((item, index) => (
                 <Item
                   key={index}

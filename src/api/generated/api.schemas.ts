@@ -44,6 +44,21 @@ export interface TokenDto {
   refreshToken: string;
 }
 
+export interface FindCompanySettings {
+  /** ID do registro */
+  id: string;
+  /** tempo de expiração das respostas em minutos */
+  answersExpirationTime: number;
+  /** ID da empresa */
+  company_id: number;
+  /** Data de criação do registro */
+  created_at: string;
+  /** Data de atualização do registro */
+  updated_at: string;
+  /** Nome da empresa */
+  companyName: string;
+}
+
 export interface Company {
   /** ID da empresa */
   id: number;
@@ -112,6 +127,13 @@ export interface UpdateCompanyDto {
   email: string;
   /** ID do nível de acesso associada à empresa */
   roleId: string;
+}
+
+export interface UpdateCompanySettingsDto {
+  /** Tempo de expiração das respostas das checklists em minutos */
+  answersExpirationTime?: number;
+  /** ID da empresa */
+  company_id: number;
 }
 
 export interface CreateEmployeeDto {
@@ -556,6 +578,19 @@ export const AnswersWithQuestionsAnomalyStatus = {
   ANOMALIA_RESTRITIVA: 'ANOMALIA_RESTRITIVA',
 } as const;
 
+/**
+ * Tipo da questão vinculada a resposta
+ */
+export type AnswersWithQuestionsType = typeof AnswersWithQuestionsType[keyof typeof AnswersWithQuestionsType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AnswersWithQuestionsType = {
+  Texto: 'Texto',
+  Múltipla_escolha: 'Múltipla escolha',
+  Upload_de_arquivo: 'Upload de arquivo',
+} as const;
+
 export interface AnswersWithQuestions {
   /** id */
   id: string;
@@ -579,6 +614,81 @@ export interface AnswersWithQuestions {
   anomalyStatus: AnswersWithQuestionsAnomalyStatus;
   /** Se teve anomalia na resposta ou não */
   hasAnomaly: boolean;
+  /** Tipo da questão vinculada a resposta */
+  type: AnswersWithQuestionsType;
+}
+
+export interface CreateAnomalyResolutionDTO {
+  /** Description of the anomaly resolution */
+  description: string;
+  /** Description of the anomaly resolution */
+  imageUrl: string;
+  /** Unique identifier for the answer associated with the anomaly resolution */
+  answer_id: string;
+}
+
+/**
+ * Description of the anomaly resolution
+ */
+export type AnomalyResolutionDescription = { [key: string]: unknown };
+
+/**
+ * Description of the anomaly resolution
+ */
+export type AnomalyResolutionImageUrl = { [key: string]: unknown };
+
+/**
+ * Status of the anomaly resolution
+ */
+export type AnomalyResolutionStatus = typeof AnomalyResolutionStatus[keyof typeof AnomalyResolutionStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AnomalyResolutionStatus = {
+  PENDING: 'PENDING',
+  RESOLVED: 'RESOLVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface AnomalyResolution {
+  /** Unique identifier for the anomaly resolution */
+  id: string;
+  /** Description of the anomaly resolution */
+  description: AnomalyResolutionDescription;
+  /** Description of the anomaly resolution */
+  imageUrl: AnomalyResolutionImageUrl;
+  /** Status of the anomaly resolution */
+  status: AnomalyResolutionStatus;
+  /** ID of the employee who approved the anomaly resolution */
+  updated_by: number;
+  /** Unique identifier for the answer associated with the anomaly resolution */
+  answer_id: string;
+  /** Timestamp when the anomaly resolution was created */
+  created_at: string;
+  /** Timestamp when the anomaly resolution was last updated */
+  updated_at: string;
+}
+
+/**
+ * Status of the anomaly resolution
+ */
+export type UpdateAnomalyResolutionDTOStatus = typeof UpdateAnomalyResolutionDTOStatus[keyof typeof UpdateAnomalyResolutionDTOStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateAnomalyResolutionDTOStatus = {
+  PENDING: 'PENDING',
+  RESOLVED: 'RESOLVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface UpdateAnomalyResolutionDTO {
+  /** Unique identifier for the anomaly resolution */
+  id: string;
+  /** Status of the anomaly resolution */
+  status: UpdateAnomalyResolutionDTOStatus;
+  /** ID of the employee who approved the anomaly resolution */
+  employee_Id: number;
 }
 
 export type EmployeesControllerFindListParams = {
@@ -661,5 +771,13 @@ export type AnswersControllerCreateForImageQuestionBody = {
   image?: Blob;
   question_id?: string;
   employee_id?: string;
+};
+
+export type AnswersControllerFindAnswersWithCheckListParams = {
+checkList_id: string;
+};
+
+export type AnswersControllerFindAnomalyResolutionByIdParams = {
+answer_id: string;
 };
 

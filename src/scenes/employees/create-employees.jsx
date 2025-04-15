@@ -16,14 +16,7 @@ import InputMask from "react-input-mask";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
-
-const initialValues = {
-  name: "",
-  email: "",
-  phone: "",
-  company_id: "",
-  roleId: "",
-};
+import { useLocation, useNavigate } from "react-router-dom";
 
 const employeeSchema = yup.object().shape({
   name: yup.string().required("Campo obrigatório"),
@@ -35,11 +28,36 @@ const employeeSchema = yup.object().shape({
 
 const CreateEmployees = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const { employeesControllerCreate, rolesControllerFindList, companiesControllerFindAll } =
-    getIndicadorOnlineAPI();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const employee = location.state || null;
+  const isEditing = !!employee;
+
+  const {
+    employeesControllerCreate,
+    employeesControllerUpdate,
+    rolesControllerFindList,
+    companiesControllerFindAll,
+  } = getIndicadorOnlineAPI();
 
   const [roles, setRoles] = useState([]);
   const [companies, setCompanies] = useState([]);
+
+  const initialValues = employee
+    ? {
+        name: employee.name || "",
+        email: employee.email || "",
+        phone: employee.phone || "",
+        company_id: String(employee.company_id || ""),
+        roleId: employee.role_id || "",
+      }
+    : {
+        name: "",
+        email: "",
+        phone: "",
+        company_id: "",
+        roleId: "",
+      };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,16 +80,25 @@ const CreateEmployees = () => {
   const handleFormSubmit = async (values, actions) => {
     try {
       const payload = {
-        ...values,
+        name: values.name,
+        email: values.email,
         phone: values.phone.replace(/\D/g, ""),
         company_id: Number(values.company_id),
+        role_id: values.roleId,
       };
 
-      await employeesControllerCreate(payload);
-      toast.success("Funcionário criado com sucesso!");
-      actions.resetForm({ values: initialValues });
+      if (isEditing) {
+        await employeesControllerUpdate({ ...payload, id: employee.id });
+        toast.success("Funcionário atualizado com sucesso!");
+      } else {
+        await employeesControllerCreate(payload);
+        toast.success("Funcionário criado com sucesso!");
+        actions.resetForm();
+      }
+
+      setTimeout(() => navigate(-1), 600);
     } catch (err) {
-      toast.error("Erro ao criar funcionário.");
+      toast.error("Erro ao salvar funcionário.");
       console.error(err);
     }
   };
@@ -79,14 +106,19 @@ const CreateEmployees = () => {
   return (
     <Box m="20px">
       <Header
-        title="Criar Funcionário"
-        subtitle="Preencha as informações do funcionário"
+        title={isEditing ? "Atualizar Funcionário" : "Criar Funcionário"}
+        subtitle={
+          isEditing
+            ? "Altere as informações do funcionário"
+            : "Preencha as informações do funcionário"
+        }
       />
 
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={employeeSchema}
+        enableReinitialize
       >
         {({
           values,
@@ -214,7 +246,7 @@ const CreateEmployees = () => {
 
             <Box display="flex" justifyContent="flex-end" mt={4}>
               <Button type="submit" color="secondary" variant="contained">
-                Criar Funcionário
+                {isEditing ? "Atualizar Funcionário" : "Criar Funcionário"}
               </Button>
             </Box>
           </form>

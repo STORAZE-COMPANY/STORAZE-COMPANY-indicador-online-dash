@@ -66,9 +66,7 @@ const FormResponses = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Chama o endpoint e armazena o response completo
         const responses = await answersControllerFindAnswersWithCheckList();
-        console.log("responses", responses)
         setData(responses);
       } catch (err) {
         console.error("Erro ao carregar dados:", err);

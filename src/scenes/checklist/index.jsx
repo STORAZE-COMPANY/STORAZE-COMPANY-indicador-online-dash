@@ -32,7 +32,6 @@ const ChecklistList = () => {
         limit: "10",
         page: "1",
       });
-      console.log("checklists", data);
       setChecklists(data);
     } catch (err) {
       toast.error("Erro ao carregar checklists.");

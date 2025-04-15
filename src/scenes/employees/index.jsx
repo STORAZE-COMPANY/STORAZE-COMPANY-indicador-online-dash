@@ -24,15 +24,15 @@ const Employees = () => {
           page: "1",
         });
 
-        console.log("response", response)
-
         const formatted = response.map((emp) => ({
           id: emp.id,
           nome: emp.name,
           email: emp.email,
           telefone: emp.phone,
-          empresaId: emp.company_id,
-          cargo: emp.role_id,
+          empresaName: emp.company_name,
+          cargo: emp.role_name,
+          company_id: emp.company_id,
+          role_id: emp.role_id,
         }));
 
         setEmployees(formatted);
@@ -43,7 +43,7 @@ const Employees = () => {
     };
 
     fetchEmployees();
-  }, []);
+  }, [employeesControllerFindList]);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.4 },
@@ -55,12 +55,40 @@ const Employees = () => {
     },
     { field: "email", headerName: "Email", flex: 1 },
     { field: "telefone", headerName: "Telefone", flex: 0.8 },
-    { field: "empresaId", headerName: "Empresa", flex: 0.6 },
+    { field: "empresaName", headerName: "Empresa", flex: 0.6 },
     { field: "cargo", headerName: "Nível de Acesso", flex: 0.8 },
+    {
+      field: "acoes",
+      headerName: "Ações",
+      flex: 0.6,
+      sortable: false,
+      renderCell: ({ row }) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handleEditarFuncionario(row)}
+        >
+          Editar
+        </Button>
+      ),
+    },
   ];
 
   const handleCriarFuncionarioClick = () => {
     navigate("/create-employees");
+  };
+
+  const handleEditarFuncionario = (row) => {
+    navigate("/create-employees", {
+      state: {
+        id: row.id,
+        name: row.nome,
+        email: row.email,
+        phone: row.telefone,
+        company_id: row.company_id,
+        role_id: row.role_id,
+      },
+    });
   };
 
   return (

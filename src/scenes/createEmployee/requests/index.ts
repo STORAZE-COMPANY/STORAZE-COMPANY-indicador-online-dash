@@ -17,7 +17,6 @@ export const createEmployee = async (
   try {
     const response = await employeesControllerCreate(employee);
   if(response){
-    console.log("Employee created successfully", response);
     onSuccess(ResponseMessages.createSuccess);
   }
   } catch (error) {
@@ -38,7 +37,6 @@ export const createEmployee = async (
 export const getCompanies = async () => { 
   try {
     const response = await companiesControllerFindAll();
-    console.log(response);
     return response;
   } catch (error) {
   

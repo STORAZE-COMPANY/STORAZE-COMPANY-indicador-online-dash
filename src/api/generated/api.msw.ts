@@ -16,6 +16,7 @@ import {
 } from 'msw';
 
 import type {
+  AnomalyResolution,
   AnswerChoice,
   AnswerResponse,
   Answers,
@@ -30,6 +31,7 @@ import type {
   CreateEmployeeResponse,
   Employee,
   EmployeeListDto,
+  FindCompanySettings,
   Question,
   QuestionsWithChoices,
   ResponseAuthDto,
@@ -45,6 +47,10 @@ export const getAuthControllerLoginMobileResponseMock = (overrideResponse: Parti
 export const getAuthControllerRefreshTokenResponseMock = (overrideResponse: Partial< ResponseAuthDto > = {}): ResponseAuthDto => ({access_token: faker.string.alpha(20), refresh_token: faker.string.alpha(20), user: {...{id: faker.string.alpha(20), name: faker.string.alpha(20), email: faker.string.alpha(20), role: faker.string.alpha(20)},}, ...overrideResponse})
 
 export const getAuthControllerGetUserAuthResponseMock = (overrideResponse: Partial< UserAuth > = {}): UserAuth => ({id: faker.string.alpha(20), name: faker.string.alpha(20), email: faker.string.alpha(20), role: faker.string.alpha(20), ...overrideResponse})
+
+export const getCompaniesControllerFindSettingsResponseMock = (): FindCompanySettings[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), answersExpirationTime: faker.number.int({min: undefined, max: undefined}), company_id: faker.number.int({min: undefined, max: undefined}), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), companyName: faker.string.alpha(20)})))
+
+export const getCompaniesControllerUpdateCompanySettingsResponseMock = (overrideResponse: Partial< CompanyResponse > = {}): CompanyResponse => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), ...overrideResponse})
 
 export const getCompaniesControllerFindAllResponseMock = (): Company[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.number.int({min: undefined, max: undefined}), name: faker.string.alpha(20), email: faker.string.alpha(20), cnpj: faker.string.alpha(20), isActive: faker.datatype.boolean(), created_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updated_at: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), role_id: faker.string.alpha(20), password: faker.string.alpha(20)})))
 
@@ -94,7 +100,15 @@ export const getAnswersControllerCreateForImageQuestionResponseMock = (overrideR
 
 export const getAnswersControllerCreateForMultipleQuestionResponseMock = (overrideResponse: Partial< AnswerChoice > = {}): AnswerChoice => ({id: faker.string.alpha(20), choice_id: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, ...overrideResponse})
 
-export const getAnswersControllerFindAnswersWithCheckListResponseMock = (): AnswersWithQuestions[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), question: faker.string.alpha(20), answer: faker.string.alpha(20), question_id: faker.string.alpha(20), companyName: faker.string.alpha(20), employeeName: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), anomalyStatus: faker.helpers.arrayElement(['ANOMALIA','ANOMALIA_RESTRITIVA'] as const), hasAnomaly: faker.datatype.boolean()})))
+export const getAnswersControllerFindAnswersWithCheckListResponseMock = (): AnswersWithQuestions[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), question: faker.string.alpha(20), answer: faker.string.alpha(20), question_id: faker.string.alpha(20), companyName: faker.string.alpha(20), employeeName: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), employee_id: faker.number.int({min: undefined, max: undefined}), anomalyStatus: faker.helpers.arrayElement(['ANOMALIA','ANOMALIA_RESTRITIVA'] as const), hasAnomaly: faker.datatype.boolean(), type: faker.helpers.arrayElement(['Texto','Múltipla escolha','Upload de arquivo'] as const)})))
+
+export const getAnswersControllerCreateAnomalyResolutionResponseMock = (overrideResponse: Partial< AnomalyResolution > = {}): AnomalyResolution => ({id: faker.string.alpha(20), description: {}, imageUrl: {}, status: faker.helpers.arrayElement(['PENDING','RESOLVED','REJECTED'] as const), updated_by: faker.number.int({min: undefined, max: undefined}), answer_id: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), ...overrideResponse})
+
+export const getAnswersControllerUpdateAnomalyResolutionResponseMock = (overrideResponse: Partial< AnomalyResolution > = {}): AnomalyResolution => ({id: faker.string.alpha(20), description: {}, imageUrl: {}, status: faker.helpers.arrayElement(['PENDING','RESOLVED','REJECTED'] as const), updated_by: faker.number.int({min: undefined, max: undefined}), answer_id: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), ...overrideResponse})
+
+export const getAnswersControllerFindAnomalyResolutionByIdResponseMock = (overrideResponse: Partial< AnomalyResolution > = {}): AnomalyResolution => ({id: faker.string.alpha(20), description: {}, imageUrl: {}, status: faker.helpers.arrayElement(['PENDING','RESOLVED','REJECTED'] as const), updated_by: faker.number.int({min: undefined, max: undefined}), answer_id: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20), ...overrideResponse})
+
+export const getAnswersControllerFindAnomalyResolutionListResponseMock = (): AnomalyResolution[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha(20), description: {}, imageUrl: {}, status: faker.helpers.arrayElement(['PENDING','RESOLVED','REJECTED'] as const), updated_by: faker.number.int({min: undefined, max: undefined}), answer_id: faker.string.alpha(20), created_at: faker.string.alpha(20), updated_at: faker.string.alpha(20)})))
 
 
 export const getAppControllerGetHelloMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
@@ -149,6 +163,30 @@ export const getAuthControllerGetUserAuthMockHandler = (overrideResponse?: UserA
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
             : getAuthControllerGetUserAuthResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getCompaniesControllerFindSettingsMockHandler = (overrideResponse?: FindCompanySettings[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<FindCompanySettings[]> | FindCompanySettings[])) => {
+  return http.get('*/companies/settings', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getCompaniesControllerFindSettingsResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getCompaniesControllerUpdateCompanySettingsMockHandler = (overrideResponse?: CompanyResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CompanyResponse> | CompanyResponse)) => {
+  return http.post('*/companies/settings', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getCompaniesControllerUpdateCompanySettingsResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -474,12 +512,62 @@ export const getAnswersControllerFindAnswersWithCheckListMockHandler = (override
       })
   })
 }
+
+export const getAnswersControllerCreateAnomalyResolutionMockHandler = (overrideResponse?: AnomalyResolution | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AnomalyResolution> | AnomalyResolution)) => {
+  return http.post('*/answers/answers-anomaly-resolution', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getAnswersControllerCreateAnomalyResolutionResponseMock()),
+      { status: 201,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getAnswersControllerUpdateAnomalyResolutionMockHandler = (overrideResponse?: AnomalyResolution | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<AnomalyResolution> | AnomalyResolution)) => {
+  return http.put('*/answers/answers-anomaly-resolution-update', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getAnswersControllerUpdateAnomalyResolutionResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getAnswersControllerFindAnomalyResolutionByIdMockHandler = (overrideResponse?: AnomalyResolution | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AnomalyResolution> | AnomalyResolution)) => {
+  return http.get('*/answers/answers-anomaly-resolution-answer-id', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getAnswersControllerFindAnomalyResolutionByIdResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getAnswersControllerFindAnomalyResolutionListMockHandler = (overrideResponse?: AnomalyResolution[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AnomalyResolution[]> | AnomalyResolution[])) => {
+  return http.get('*/answers/answers-anomaly-resolution-get', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getAnswersControllerFindAnomalyResolutionListResponseMock()),
+      { status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
 export const getIndicadorOnlineAPIMock = () => [
   getAppControllerGetHelloMockHandler(),
   getAuthControllerLoginDashboardMockHandler(),
   getAuthControllerLoginMobileMockHandler(),
   getAuthControllerRefreshTokenMockHandler(),
   getAuthControllerGetUserAuthMockHandler(),
+  getCompaniesControllerFindSettingsMockHandler(),
+  getCompaniesControllerUpdateCompanySettingsMockHandler(),
   getCompaniesControllerFindAllMockHandler(),
   getCompaniesControllerCreateMockHandler(),
   getCompaniesControllerUpdateMockHandler(),
@@ -506,4 +594,8 @@ export const getIndicadorOnlineAPIMock = () => [
   getAnswersControllerFindByQuestionIdMockHandler(),
   getAnswersControllerCreateForImageQuestionMockHandler(),
   getAnswersControllerCreateForMultipleQuestionMockHandler(),
-  getAnswersControllerFindAnswersWithCheckListMockHandler()]
+  getAnswersControllerFindAnswersWithCheckListMockHandler(),
+  getAnswersControllerCreateAnomalyResolutionMockHandler(),
+  getAnswersControllerUpdateAnomalyResolutionMockHandler(),
+  getAnswersControllerFindAnomalyResolutionByIdMockHandler(),
+  getAnswersControllerFindAnomalyResolutionListMockHandler()]

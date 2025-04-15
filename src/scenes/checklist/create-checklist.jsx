@@ -164,20 +164,16 @@ const ChecklistForm = () => {
                   ? "IA"
                   : "Text",
               iaPrompt: q.promptIA || undefined,
+              
               multiple_choice:
                 q.questionType === "Múltipla escolha"
                   ? q.options.map((opt) => ({
                       choice: opt.value,
-                      anomaly: opt.isAnomaly
-                        ? opt.anomalyLevel === "HIGH"
-                          ? "ANOMALIA_RESTRITIVA"
-                          : "ANOMALIA"
-                        : undefined,
                     }))
                   : [],
             })),
         }))
-        .filter((item) => item.question_list.length > 0); 
+        .filter((item) => item.question_list.length > 0);
 
       if (!checklistName.trim()) {
         toast.error("O nome do checklist é obrigatório.");
@@ -196,6 +192,10 @@ const ChecklistForm = () => {
 
       await checklistsControllerCreate(payload);
       toast.success("Checklist publicado com sucesso!");
+
+      setTimeout(() => {
+        navigate(-1);
+      }, 500);
 
       setChecklistName("");
       setCategories([
@@ -252,7 +252,7 @@ const ChecklistForm = () => {
           sx={{ mb: 4, p: 2, bgcolor: "#434957", borderRadius: 3 }}
         >
           <Typography variant="h6" color="#7ec8f2" gutterBottom>
-            Categoria {catIdx + 1}
+            Categoria
           </Typography>
 
           <FormControl fullWidth sx={{ mb: 2 }}>
@@ -273,6 +273,57 @@ const ChecklistForm = () => {
               ))}
             </Select>
           </FormControl>
+
+          <Box display="flex" gap={2} alignItems="center" mb={2}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Nova categoria"
+              value={cat.newCategoryName || ""}
+              onChange={(e) => {
+                const newCategories = [...categories];
+                newCategories[catIdx].newCategoryName = e.target.value;
+                setCategories(newCategories);
+              }}
+              sx={{
+                backgroundColor: "#3b4050",
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#7ec8f2",
+                },
+              }}
+              InputProps={{ style: { color: "#fff" } }}
+            />
+            <Button
+              variant="outlined"
+              onClick={async () => {
+                const name = cat.newCategoryName?.trim();
+                if (!name)
+                  return toast.error("Digite um nome para a nova categoria");
+
+                try {
+                  const response =
+                    await getIndicadorOnlineAPI().categoriesControllerCreate({
+                      name,
+                    });
+                  setAvailableCategories((prev) => [...prev, response]);
+                  const newCategories = [...categories];
+                  newCategories[catIdx].categoryName = response.id;
+                  newCategories[catIdx].newCategoryName = "";
+                  setCategories(newCategories);
+                  toast.success("Categoria criada com sucesso!");
+                } catch (err) {
+                  toast.error("Erro ao criar categoria");
+                  console.error(err);
+                }
+              }}
+              sx={{ color: "#7ec8f2", borderColor: "#7ec8f2" }}
+            >
+              Criar Categoria
+            </Button>
+          </Box>
+
+          <Divider sx={{ backgroundColor: "#7ec8f2", mb: 1 }} />
 
           {cat.questions.map((q, qIdx) => (
             <Box key={q.id} mb={3} p={2} bgcolor="#6E7484" borderRadius={2}>
@@ -364,7 +415,14 @@ const ChecklistForm = () => {
               {q.questionType === "Múltipla escolha" && (
                 <Box>
                   {q.options.map((opt, optIdx) => (
-                    <Box key={optIdx} display="flex" alignItems="center" mb={1}>
+                    <Box
+                      key={optIdx}
+                      display="flex"
+                      alignItems="center"
+                      mb={1}
+                      gap={2}
+                      flexWrap="wrap"
+                    >
                       <TextField
                         placeholder={`Opção ${optIdx + 1}`}
                         value={opt.value}
@@ -376,62 +434,37 @@ const ChecklistForm = () => {
                           setCategories(newCategories);
                         }}
                         sx={{
-                          mr: 2,
                           flex: 1,
                           backgroundColor: "#3b4050",
                           input: { color: "#fff" },
                         }}
                       />
-                      <Checkbox
-                        checked={opt.isAnomaly}
-                        onChange={(e) =>
-                          handleOptionAnomalyChange(
-                            catIdx,
-                            qIdx,
-                            optIdx,
-                            e.target.checked
-                          )
-                        }
-                        sx={{ color: "#7ec8f2" }}
-                      />
-                      {opt.isAnomaly && (
-                        <>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={opt.anomalyLevel === "HIGH"}
-                                onChange={() =>
-                                  handleAnomalyLevelChange(
-                                    catIdx,
-                                    qIdx,
-                                    optIdx,
-                                    "HIGH"
-                                  )
-                                }
-                              />
-                            }
-                            label="Restritiva"
-                            sx={{ color: "#fff" }}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={opt.anomalyLevel === "MEDIUM"}
-                                onChange={() =>
-                                  handleAnomalyLevelChange(
-                                    catIdx,
-                                    qIdx,
-                                    optIdx,
-                                    "MEDIUM"
-                                  )
-                                }
-                              />
-                            }
-                            label="Não Restritiva"
-                            sx={{ color: "#fff" }}
-                          />
-                        </>
-                      )}
+
+                      <FormControl sx={{ minWidth: 180 }}>
+                        <InputLabel sx={{ color: "#fff" }}>
+                          Tipo de Anomalia
+                        </InputLabel>
+                        <Select
+                          value={opt.anomalyLevel || ""}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const newCategories = [...categories];
+                            newCategories[catIdx].questions[qIdx].options[
+                              optIdx
+                            ].anomalyLevel = value;
+                            newCategories[catIdx].questions[qIdx].options[
+                              optIdx
+                            ].isAnomaly = value !== "";
+                            setCategories(newCategories);
+                          }}
+                          sx={{ backgroundColor: "#3b4050", color: "#fff" }}
+                        >
+                          <MenuItem value={null}>Sem Anomalia</MenuItem>
+                          <MenuItem value="HIGH">Restritiva</MenuItem>
+                          <MenuItem value="MEDIUM">Não Restritiva</MenuItem>
+                        </Select>
+                      </FormControl>
+
                       <IconButton
                         onClick={() => handleDeleteOption(catIdx, qIdx, optIdx)}
                       >
@@ -439,6 +472,7 @@ const ChecklistForm = () => {
                       </IconButton>
                     </Box>
                   ))}
+
                   <Button
                     onClick={() => handleAddOption(catIdx, qIdx)}
                     variant="outlined"

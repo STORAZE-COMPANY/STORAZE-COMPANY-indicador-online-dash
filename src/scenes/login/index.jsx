@@ -39,7 +39,6 @@ const Login = () => {
   
       navigate("/checklists");
     } catch (error) {
-      console.log("error", error)
       toast.error("Credenciais inválidas");
     }
   };

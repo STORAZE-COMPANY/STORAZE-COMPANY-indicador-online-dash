@@ -22,6 +22,10 @@ const CreateCategory = () => {
       await categoriesControllerCreate(values);
       toast.success("Categoria criada com sucesso!");
       actions.resetForm({ values: initialValues });
+
+      setTimeout(() => {
+        navigate(-1);
+      }, 500);
     } catch (err) {
       toast.error("Erro ao criar categoria.");
       console.error(err);
