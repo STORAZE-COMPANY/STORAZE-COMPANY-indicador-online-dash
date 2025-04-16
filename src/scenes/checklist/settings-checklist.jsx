@@ -46,12 +46,23 @@ const SettingsChecklist = () => {
       toast.error("Insira uma data válida.");
       return;
     }
+  
+    if (!checkListId) {
+      toast.error("Checklist ainda não carregado.");
+      return;
+    }
+  
     try {
+      // Converte a data para o formato ISO correto com hora 23:59:59
+      const fullDate = new Date(`${expirationDate}T23:59:59`);
+      const isoDate = fullDate.toISOString();
+  
       const payload = {
-        expiriesTime: expirationDate,
-        imagesExpiriesTime: expirationDate, 
-        checkListId, 
+        expiriesTime: isoDate,
+        imagesExpiriesTime: isoDate,
+        checkListId,
       };
+  
       await checklistsControllerUpdateExpiriesTime(payload);
       toast.success("Data de expiração atualizada com sucesso!");
     } catch (error) {
@@ -86,7 +97,7 @@ const SettingsChecklist = () => {
   return (
     <Box p={4} bgcolor="#141B2D" color="#fff">
       <Typography variant="h4" mb={3} color="#7ec8f2">
-        Settings Checklist
+        Configuração do Checklist
       </Typography>
 
       {/* Seção de atualização da data de expiração */}

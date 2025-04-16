@@ -36,28 +36,20 @@ const CreateEmployees = () => {
   const {
     employeesControllerCreate,
     employeesControllerUpdate,
+    employeesControllerFindList,
     rolesControllerFindList,
     companiesControllerFindAll,
   } = getIndicadorOnlineAPI();
 
   const [roles, setRoles] = useState([]);
   const [companies, setCompanies] = useState([]);
-
-  const initialValues = employee
-    ? {
-        name: employee.name || "",
-        email: employee.email || "",
-        phone: employee.phone || "",
-        company_id: String(employee.company_id || ""),
-        roleId: employee.role_id || "",
-      }
-    : {
-        name: "",
-        email: "",
-        phone: "",
-        company_id: "",
-        roleId: "",
-      };
+  const [formValues, setFormValues] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    company_id: "",
+    roleId: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +60,23 @@ const CreateEmployees = () => {
         ]);
         setRoles(rolesRes);
         setCompanies(companiesRes);
+
+        if (isEditing && employee?.id) {
+          const allEmployees = await employeesControllerFindList({
+            limit: "100",
+            page: "1",
+          });
+          const current = allEmployees.find((e) => e.id === employee.id);
+          if (current) {
+            setFormValues({
+              name: current.name || "",
+              email: current.email || "",
+              phone: current.phone || "",
+              company_id: String(current.company_id || ""),
+              roleId: current.role_id || "",
+            });
+          }
+        }
       } catch (err) {
         toast.error("Erro ao carregar dados");
         console.error(err);
@@ -84,7 +93,7 @@ const CreateEmployees = () => {
         email: values.email,
         phone: values.phone.replace(/\D/g, ""),
         company_id: Number(values.company_id),
-        roleId: values.roleId,
+        role_id: values.roleId,
       };
 
       if (isEditing) {
@@ -116,7 +125,7 @@ const CreateEmployees = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={formValues}
         validationSchema={employeeSchema}
         enableReinitialize
       >

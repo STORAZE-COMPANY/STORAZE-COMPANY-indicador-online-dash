@@ -4,10 +4,6 @@ import {
   TextField,
   useMediaQuery,
   Typography,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
 } from "@mui/material";
 import { Header } from "../../components";
 import { Formik } from "formik";
@@ -16,42 +12,54 @@ import InputMask from "react-input-mask";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
-
-const initialValues = {
-  name: "",
-  cnpj: "",
-  email: "",
-  isActive: true,
-  roleId: "",
-};
+import { useLocation, useNavigate } from "react-router-dom";
 
 const empresaSchema = yup.object().shape({
   name: yup.string().required("Campo obrigatório"),
   cnpj: yup.string().required("Campo obrigatório"),
   email: yup.string().email("Email inválido").required("Campo obrigatório"),
-  roleId: yup.string().required("Nível de acesso obrigatório"),
 });
 
 const CreateCompany = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const { companiesControllerCreate, rolesControllerFindList } =
-    getIndicadorOnlineAPI();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const companyId = location.state?.id || null;
+  const isEditing = !!companyId;
 
-  const [roles, setRoles] = useState([]);
+  const {
+    companiesControllerCreate,
+    companiesControllerUpdate,
+    companiesControllerFindOne,
+  } = getIndicadorOnlineAPI();
+
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    cnpj: "",
+    email: "",
+    isActive: true,
+  });
 
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchData = async () => {
       try {
-        const response = await rolesControllerFindList();
-        setRoles(response);
+        if (isEditing) {
+          const companyRes = await companiesControllerFindOne(companyId);
+          setInitialValues({
+            name: companyRes.name,
+            cnpj: companyRes.cnpj,
+            email: companyRes.email,
+            isActive: companyRes.isActive,
+          });
+        }
       } catch (err) {
-        toast.error("Erro ao carregar níveis de acesso");
+        toast.error("Erro ao carregar dados");
         console.error(err);
       }
     };
 
-    fetchRoles();
-  }, []);
+    fetchData();
+  }, [companyId]);
 
   const handleFormSubmit = async (values, actions) => {
     try {
@@ -60,11 +68,20 @@ const CreateCompany = () => {
         cnpj: values.cnpj.replace(/\D/g, ""),
       };
 
-      await companiesControllerCreate(payload);
-      toast.success("Empresa criada com sucesso!");
-      actions.resetForm({ values: initialValues });
+      if (isEditing) {
+        await companiesControllerUpdate({ ...payload, id: companyId });
+        toast.success("Empresa atualizada com sucesso!");
+      } else {
+        await companiesControllerCreate(payload);
+        toast.success("Empresa criada com sucesso!");
+        actions.resetForm();
+      }
+
+      setTimeout(() => {
+        navigate("/company");
+      }, 500)
     } catch (err) {
-      toast.error("Erro ao criar empresa.");
+      toast.error("Erro ao salvar empresa.");
       console.error(err);
     }
   };
@@ -72,14 +89,19 @@ const CreateCompany = () => {
   return (
     <Box m="20px">
       <Header
-        title="Criar Empresa"
-        subtitle="Preencha as informações da empresa"
+        title={isEditing ? "Editar Empresa" : "Criar Empresa"}
+        subtitle={
+          isEditing
+            ? "Atualize as informações da empresa"
+            : "Preencha as informações da empresa"
+        }
       />
 
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={empresaSchema}
+        enableReinitialize
       >
         {({
           values,
@@ -88,7 +110,6 @@ const CreateCompany = () => {
           handleBlur,
           handleChange,
           handleSubmit,
-          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -135,6 +156,7 @@ const CreateCompany = () => {
                   />
                 )}
               </InputMask>
+
               <TextField
                 fullWidth
                 variant="filled"
@@ -148,38 +170,11 @@ const CreateCompany = () => {
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
-
-              <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="role-label" sx={{ color: "#999" }}>
-                  Nível de Acesso
-                </InputLabel>
-                <Select
-                  labelId="role-label"
-                  name="roleId"
-                  value={values.roleId}
-                  onChange={(e) => setFieldValue("roleId", e.target.value)}
-                  onBlur={handleBlur}
-                  variant="filled"
-                  sx={{ color: "#fff" }}
-                  error={touched.roleId && !!errors.roleId}
-                >
-                  {roles.map((role) => (
-                    <MenuItem key={role.id} value={role.id}>
-                      {role.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {touched.roleId && errors.roleId && (
-                  <Typography color="error" fontSize={13}>
-                    {errors.roleId}
-                  </Typography>
-                )}
-              </FormControl>
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt={4}>
               <Button type="submit" color="secondary" variant="contained">
-                Criar Empresa
+                {isEditing ? "Atualizar Empresa" : "Criar Empresa"}
               </Button>
             </Box>
           </form>

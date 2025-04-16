@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Button, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  useTheme,
+  TablePagination,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
-import { AddBusinessOutlined } from "@mui/icons-material";
+import { AddOutlined, EditOutlined, DeleteOutline } from "@mui/icons-material";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 import { toast } from "react-toastify";
 
@@ -12,71 +20,48 @@ const Employees = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const { employeesControllerFindList } = getIndicadorOnlineAPI();
+  const {
+    employeesControllerFindList,
+    employeesControllerRemove,
+  } = getIndicadorOnlineAPI();
 
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [hasNextPage, setHasNextPage] = useState(false);
+
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const response = await employeesControllerFindList({
+        page: (page + 1).toString(),
+        limit: rowsPerPage.toString(),
+      });
+
+      const formatted = response.map((item) => ({
+        id: item.id,
+        nome: item.name,
+        email: item.email,
+        telefone: item.phone,
+        empresa: item.company_name,
+        nivel: item.role_name,
+        company_id: item.company_id,
+        role_id: item.role_id,
+      }));
+
+      setEmployees(formatted);
+      setHasNextPage(response.length === rowsPerPage);
+    } catch (err) {
+      toast.error("Erro ao buscar funcionários");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await employeesControllerFindList({
-          limit: "50",
-          page: "1",
-        });
-
-        const formatted = response.map((emp) => ({
-          id: emp.id,
-          nome: emp.name,
-          email: emp.email,
-          telefone: emp.phone,
-          empresaName: emp.company_name,
-          cargo: emp.role_name,
-          company_id: emp.company_id,
-          role_id: emp.role_id,
-        }));
-
-        setEmployees(formatted);
-      } catch (err) {
-        console.error(err);
-        toast.error("Erro ao buscar funcionários");
-      }
-    };
-
     fetchEmployees();
-  }, [employeesControllerFindList]);
-
-  const columns = [
-    { field: "id", headerName: "ID", flex: 0.4 },
-    {
-      field: "nome",
-      headerName: "Nome do Funcionário",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "telefone", headerName: "Telefone", flex: 0.8 },
-    { field: "empresaName", headerName: "Empresa", flex: 0.6 },
-    { field: "cargo", headerName: "Nível de Acesso", flex: 0.8 },
-    {
-      field: "acoes",
-      headerName: "Ações",
-      flex: 0.6,
-      sortable: false,
-      renderCell: ({ row }) => (
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => handleEditarFuncionario(row)}
-        >
-          Editar
-        </Button>
-      ),
-    },
-  ];
-
-  const handleCriarFuncionarioClick = () => {
-    navigate("/create-employees");
-  };
+  }, [page, rowsPerPage]);
 
   const handleEditarFuncionario = (row) => {
     navigate("/create-employees", {
@@ -86,32 +71,79 @@ const Employees = () => {
         email: row.email,
         phone: row.telefone,
         company_id: row.company_id,
-        role_id: row.role_id,
+        roleId: row.role_id,
       },
     });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await employeesControllerRemove(id);
+      toast.success("Funcionário removido com sucesso!");
+      fetchEmployees();
+    } catch (err) {
+      toast.error("Erro ao remover funcionário.");
+    }
+  };
+
+  const columns = [
+    { field: "id", headerName: "ID", flex: 0.4 },
+    { field: "nome", headerName: "Nome", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "telefone", headerName: "Telefone", flex: 1 },
+    { field: "empresa", headerName: "Empresa", flex: 1 },
+    { field: "nivel", headerName: "Nível de Acesso", flex: 1 },
+    {
+      field: "acoes",
+      headerName: "Ações",
+      flex: 0.8,
+      renderCell: ({ row }) => (
+        <Box display="flex" gap={1}>
+          <Tooltip title="Editar">
+            <IconButton onClick={() => handleEditarFuncionario(row)}>
+              <EditOutlined />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Excluir">
+            <IconButton onClick={() => handleDelete(row.id)}>
+              <DeleteOutline color="error" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
+
+  const handleChangePage = (event, newPage) => {
+    if (newPage > page && !hasNextPage) return;
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Funcionários" subtitle="Gerenciar Funcionários" />
+        <Header title="Funcionários" subtitle="Gerenciar Equipe" />
         <Button
           variant="contained"
           color="secondary"
-          startIcon={<AddBusinessOutlined />}
-          onClick={handleCriarFuncionarioClick}
+          startIcon={<AddOutlined />}
+          onClick={() => navigate("/create-employees")}
         >
-          Criar Funcionário
+          Adicionar Funcionário
         </Button>
       </Box>
 
       <Box
         mt="40px"
-        height="75vh"
+        height="72vh"
         sx={{
           "& .MuiDataGrid-root": { border: "none" },
           "& .MuiDataGrid-cell": { border: "none" },
-          "& .name-column--cell": { color: colors.greenAccent[300] },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
@@ -123,19 +155,34 @@ const Employees = () => {
             borderTop: "none",
             backgroundColor: colors.blueAccent[700],
           },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiDataGrid-iconSeparator": {
-            color: colors.primary[100],
-          },
         }}
       >
         <DataGrid
           rows={employees}
           columns={columns}
-          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-          checkboxSelection
+          disableRowSelectionOnClick
+          hideFooter
+          loading={loading}
+        />
+      </Box>
+
+      <Box display="flex" justifyContent="flex-end" mt={2}>
+        <TablePagination
+          component="div"
+          count={-1}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Itens por página:"
+          nextIconButtonProps={{ disabled: !hasNextPage }}
+          sx={{
+            color: "#fff",
+            ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows": {
+              color: "#fff",
+            },
+            ".MuiSvgIcon-root": { color: "#fff" },
+          }}
         />
       </Box>
     </Box>

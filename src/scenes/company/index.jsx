@@ -1,43 +1,56 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Button, useTheme } from "@mui/material";
+import { Box, Typography, Button, useTheme, IconButton, Stack } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
-import { AddBusinessOutlined } from "@mui/icons-material";
+import { AddBusinessOutlined, DeleteOutline } from "@mui/icons-material";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const Company = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const { companiesControllerFindAll } = getIndicadorOnlineAPI();
+  const { companiesControllerFindAll, companiesControllerRemove } = getIndicadorOnlineAPI();
 
   const [empresas, setEmpresas] = useState([]);
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await companiesControllerFindAll();
-        console.log("response", response)
-        const formatted = response.map((item) => ({
-          id: item.id,
-          nome: item.name,
-          email: item.email,
-          status: item.isActive ? "Ativa" : "Inativa",
-          cidade: "N/A", 
-          contacto: "N/A", 
-          checklists: [], 
-        }));
-        setEmpresas(formatted);
-      } catch (err) {
-        toast.error("Erro ao buscar empresas");
-      }
-    };
+  const fetchCompanies = async () => {
+    try {
+      const response = await companiesControllerFindAll();
+      const formatted = response.map((item) => ({
+        id: item.id,
+        nome: item.name,
+        email: item.email,
+        status: item.isActive ? "Ativa" : "Inativa",
+        cidade: "N/A",
+        contacto: "N/A",
+        checklists: [],
+      }));
+      setEmpresas(formatted);
+    } catch (err) {
+      toast.error("Erro ao buscar empresas");
+    }
+  };
 
+  useEffect(() => {
     fetchCompanies();
   }, []);
+
+  const handleDelete = async (id) => {
+  /*   const confirm = window.confirm("Tem certeza que deseja excluir esta empresa?");
+    if (!confirm) return; */
+
+    try {
+      await companiesControllerRemove(id);
+      toast.success("Empresa excluída com sucesso!");
+      setEmpresas((prev) => prev.filter((empresa) => empresa.id !== id));
+    } catch (err) {
+      toast.error("Erro ao excluir empresa.");
+      console.error(err);
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -98,6 +111,30 @@ const Company = () => {
         </Box>
       ),
     },
+    {
+      field: "acoes",
+      headerName: "Ações",
+      flex: 1,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => navigate("/create-company", { state: params.row })}
+          >
+            Editar
+          </Button>
+          <IconButton
+            onClick={() => handleDelete(params.row.id)}
+            color="error"
+            size="small"
+          >
+            <DeleteOutline />
+          </IconButton>
+        </Stack>
+      ),
+    },
   ];
 
   const handleCriarEmpresaClick = () => {
@@ -151,6 +188,7 @@ const Company = () => {
           checkboxSelection
         />
       </Box>
+      <ToastContainer />
     </Box>
   );
 };

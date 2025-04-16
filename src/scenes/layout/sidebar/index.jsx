@@ -39,7 +39,6 @@ const SideBar = () => {
 
   const userRole = dataAuth?.user?.role;
 
-  console.log("userRole", dataAuth)
 
   let menuItems = [];
   if (userRole === "superAdmin") {

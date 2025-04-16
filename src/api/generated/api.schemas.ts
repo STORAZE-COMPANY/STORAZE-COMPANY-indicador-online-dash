@@ -74,8 +74,6 @@ export interface Company {
   created_at?: string;
   /** Última atualização da empresa */
   updated_at?: string;
-  /** Id do Nível de acesso da empresa */
-  role_id: string;
   /** Senha da empresa */
   password: string;
 }
@@ -89,8 +87,6 @@ export interface CreateCompanyDto {
   isActive: boolean;
   /** Email da empresa */
   email: string;
-  /** ID do nível de acesso associada à empresa */
-  roleId: string;
 }
 
 export interface CompanyResponse {
@@ -108,8 +104,6 @@ export interface CompanyResponse {
   created_at?: string;
   /** Última atualização da empresa */
   updated_at?: string;
-  /** Id do Nível de acesso da empresa */
-  role_id: string;
 }
 
 export interface ConflictException { [key: string]: unknown }
@@ -125,8 +119,6 @@ export interface UpdateCompanyDto {
   isActive: boolean;
   /** Email da empresa */
   email: string;
-  /** ID do nível de acesso associada à empresa */
-  roleId: string;
 }
 
 export interface UpdateCompanySettingsDto {
@@ -333,6 +325,19 @@ export interface CheckListItemFormattedList {
   hasAnomalies: boolean;
 }
 
+export interface GroupedCheckList {
+  /** ID do checklist */
+  id: string;
+  /** Nome do checklist */
+  name: string;
+  /** ID da categoria do checklist */
+  categories_id: string;
+  /** Indica se o checklist possui anomalias */
+  hasAnomalies: boolean;
+  /** Lista de empresas associadas ao checklist */
+  companies: Company[];
+}
+
 export interface CheckListForSpecificEmployee {
   /** ID do checklist */
   checklistId: string;
@@ -371,6 +376,15 @@ export interface UpdateExpiriesTime {
   imagesExpiriesTime: string;
   /** id */
   checkListId: string;
+}
+
+export interface BatchConnectCompanyToChecklistDto {
+  /** The ID of the company to connect to the checklist */
+  companyId: number;
+  /** The ID of the checklist to connect to the company */
+  checklistId: string;
+  /** id of the category */
+  categories_id: string;
 }
 
 export interface Roles {
@@ -526,7 +540,7 @@ export interface CreateAnswerDto {
   /** ID da pergunta */
   question_id: string;
   /** ID do funcionário */
-  employee_id: string;
+  employee_id: number;
   /** Resposta da pergunta */
   textAnswer: string;
 }
@@ -726,6 +740,29 @@ limit: string;
 page: string;
 };
 
+export type ChecklistsControllerFindCheckListPaginatedByParamsParams = {
+/**
+ * Data inicial
+ */
+startDate?: string;
+/**
+ * Data final
+ */
+endDate?: string;
+/**
+ * Buscar por empresa
+ */
+byCompany?: number;
+/**
+ * Limite de registros por página
+ */
+limit: string;
+/**
+ * Página de registros
+ */
+page: string;
+};
+
 export type ChecklistsControllerFindPaginatedByEmployeeParamsParams = {
 /**
  * ID do funcionário
@@ -767,7 +804,7 @@ question_id: string;
 export type AnswersControllerCreateForImageQuestionBody = {
   image?: Blob;
   question_id?: string;
-  employee_id?: string;
+  employee_id?: number;
 };
 
 export type AnswersControllerFindAnswersWithCheckListParams = {

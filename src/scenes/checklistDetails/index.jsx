@@ -15,8 +15,6 @@ const ChecklistDetail = () => {
   const navigate = useNavigate();
   const checklist = location.state;
 
-  console.log(checklist);
-
   const {
     answersControllerFindAnomalyResolutionById,
     answersControllerUpdateAnomalyResolution,
