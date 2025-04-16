@@ -338,6 +338,8 @@ export interface CheckListForSpecificEmployee {
   checklistId: string;
   /** Nome do checklist */
   checklistName: string;
+  /** Nome da categoria do checklist */
+  categoryName: string;
 }
 
 export interface UpdateCompanyRelated {
@@ -618,15 +620,6 @@ export interface AnswersWithQuestions {
   type: AnswersWithQuestionsType;
 }
 
-export interface CreateAnomalyResolutionDTO {
-  /** Description of the anomaly resolution */
-  description: string;
-  /** Description of the anomaly resolution */
-  imageUrl: string;
-  /** Unique identifier for the answer associated with the anomaly resolution */
-  answer_id: string;
-}
-
 /**
  * Description of the anomaly resolution
  */
@@ -706,6 +699,10 @@ limit: string;
 page: string;
 };
 
+export type EmployeesControllerSendEmailParams = {
+email: string;
+};
+
 export type ChecklistsControllerFindPaginatedByParamsParams = {
 /**
  * Data inicial
@@ -775,6 +772,12 @@ export type AnswersControllerCreateForImageQuestionBody = {
 
 export type AnswersControllerFindAnswersWithCheckListParams = {
 checkList_id: string;
+};
+
+export type AnswersControllerCreateAnomalyResolutionBody = {
+  image?: Blob;
+  description?: string;
+  answer_id?: string;
 };
 
 export type AnswersControllerFindAnomalyResolutionByIdParams = {

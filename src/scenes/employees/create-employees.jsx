@@ -84,7 +84,7 @@ const CreateEmployees = () => {
         email: values.email,
         phone: values.phone.replace(/\D/g, ""),
         company_id: Number(values.company_id),
-        role_id: values.roleId,
+        roleId: values.roleId,
       };
 
       if (isEditing) {

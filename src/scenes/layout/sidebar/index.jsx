@@ -39,6 +39,8 @@ const SideBar = () => {
 
   const userRole = dataAuth?.user?.role;
 
+  console.log("userRole", dataAuth)
+
   let menuItems = [];
   if (userRole === "superAdmin") {
     menuItems = [
@@ -76,6 +78,11 @@ const SideBar = () => {
     ];
   } else if (userRole === "Admin") {
     menuItems = [
+      {
+        title: "Gerenciar CheckList",
+        path: "/checklists",
+        icon: <ChecklistOutlined />,
+      },
       {
         title: "Gerenciar Respostas",
         path: "/formresponse",

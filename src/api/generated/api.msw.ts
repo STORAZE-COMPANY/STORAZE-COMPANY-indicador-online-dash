@@ -70,7 +70,7 @@ export const getChecklistsControllerCreateResponseMock = (overrideResponse: Part
 
 export const getChecklistsControllerFindPaginatedByParamsResponseMock = (): CheckListItemFormattedList[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({checklistItemId: faker.string.alpha(20), categories_id: faker.string.alpha(20), checkList_id: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, company_id: faker.number.int({min: undefined, max: undefined}), checklistName: faker.string.alpha(20), companyName: faker.string.alpha(20), companyId: faker.string.alpha(20), hasAnomalies: faker.datatype.boolean()})))
 
-export const getChecklistsControllerFindPaginatedByEmployeeParamsResponseMock = (): CheckListForSpecificEmployee[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({checklistId: faker.string.alpha(20), checklistName: faker.string.alpha(20)})))
+export const getChecklistsControllerFindPaginatedByEmployeeParamsResponseMock = (): CheckListForSpecificEmployee[] => (Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({checklistId: faker.string.alpha(20), checklistName: faker.string.alpha(20), categoryName: faker.string.alpha(20)})))
 
 export const getChecklistsControllerUpdateCompanyIdResponseMock = (overrideResponse: Partial< CheckListItem > = {}): CheckListItem => ({id: faker.string.alpha(20), categories_id: faker.string.alpha(20), checkList_id: faker.string.alpha(20), created_at: `${faker.date.past().toISOString().split('.')[0]}Z`, updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`, company_id: faker.number.int({min: undefined, max: undefined}), ...overrideResponse})
 
@@ -283,6 +283,16 @@ export const getEmployeesControllerUpdateMockHandler = (overrideResponse?: Emplo
             : getEmployeesControllerUpdateResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
+      })
+  })
+}
+
+export const getEmployeesControllerSendEmailMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)) => {
+  return http.get('*/employees/send-email', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
+      { status: 200,
+        
       })
   })
 }
@@ -576,6 +586,7 @@ export const getIndicadorOnlineAPIMock = () => [
   getEmployeesControllerCreateMockHandler(),
   getEmployeesControllerFindListMockHandler(),
   getEmployeesControllerUpdateMockHandler(),
+  getEmployeesControllerSendEmailMockHandler(),
   getChecklistsControllerCreateMockHandler(),
   getChecklistsControllerFindPaginatedByParamsMockHandler(),
   getChecklistsControllerFindPaginatedByEmployeeParamsMockHandler(),

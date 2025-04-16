@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import App from "./App";
 import {
   Dashboard,
@@ -29,14 +29,23 @@ import Category from "./scenes/categories/index.jsx";
 import CreateCategory from "./scenes/categories/create-category.jsx";
 import SettingsChecklist from "./scenes/checklist/settings-checklist.jsx";
 import ChecklistDetail from "./scenes/checklistDetails/index.jsx";
+import { getToken } from "./auth/auth.jsx";
 
 const AppRouter = () => {
+  const isAuthenticated = getToken();
+
+
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/formresponse" replace /> : <Login />
+          }
+        />
 
-     <Route
+        <Route
           path="/"
           element={
             <ProtectedRoute>
@@ -44,7 +53,8 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Dashboard />} />
+          {/* Define a rota inicial como /checklistform */}
+          <Route index element={<Navigate to="/checklistform" replace />} />
 
           <Route path="/team" element={<Team />} />
 

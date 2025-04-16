@@ -10,6 +10,7 @@ import type {
   AnswerChoice,
   AnswerResponse,
   Answers,
+  AnswersControllerCreateAnomalyResolutionBody,
   AnswersControllerCreateForImageQuestionBody,
   AnswersControllerFindAnomalyResolutionByIdParams,
   AnswersControllerFindAnswersWithCheckListParams,
@@ -24,7 +25,6 @@ import type {
   ChecklistsControllerFindPaginatedByParamsParams,
   Company,
   CompanyResponse,
-  CreateAnomalyResolutionDTO,
   CreateAnswerChoice,
   CreateAnswerDto,
   CreateCategoriesDto,
@@ -35,6 +35,7 @@ import type {
   Employee,
   EmployeeListDto,
   EmployeesControllerFindListParams,
+  EmployeesControllerSendEmailParams,
   FindCompanySettings,
   LoginDto,
   Question,
@@ -208,6 +209,16 @@ const employeesControllerUpdate = (
       {url: `http://localhost:3000/employees`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateEmployeeDto
+    },
+      );
+    }
+  
+const employeesControllerSendEmail = (
+    params: EmployeesControllerSendEmailParams,
+ ) => {
+      return customInstance<void>(
+      {url: `http://localhost:3000/employees/send-email`, method: 'GET',
+        params
     },
       );
     }
@@ -418,12 +429,22 @@ const answersControllerFindAnswersWithCheckList = (
     }
   
 const answersControllerCreateAnomalyResolution = (
-    createAnomalyResolutionDTO: CreateAnomalyResolutionDTO,
- ) => {
+    answersControllerCreateAnomalyResolutionBody: AnswersControllerCreateAnomalyResolutionBody,
+ ) => {const formData = new FormData();
+if(answersControllerCreateAnomalyResolutionBody.image !== undefined) {
+ formData.append('image', answersControllerCreateAnomalyResolutionBody.image)
+ }
+if(answersControllerCreateAnomalyResolutionBody.description !== undefined) {
+ formData.append('description', answersControllerCreateAnomalyResolutionBody.description)
+ }
+if(answersControllerCreateAnomalyResolutionBody.answer_id !== undefined) {
+ formData.append('answer_id', answersControllerCreateAnomalyResolutionBody.answer_id)
+ }
+
       return customInstance<AnomalyResolution>(
       {url: `http://localhost:3000/answers/answers-anomaly-resolution`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createAnomalyResolutionDTO
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData
     },
       );
     }
@@ -458,7 +479,7 @@ const answersControllerFindAnomalyResolutionList = (
       );
     }
   
-return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindSettings,companiesControllerUpdateCompanySettings,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,answersControllerCreateAnomalyResolution,answersControllerUpdateAnomalyResolution,answersControllerFindAnomalyResolutionById,answersControllerFindAnomalyResolutionList}};
+return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindSettings,companiesControllerUpdateCompanySettings,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,employeesControllerSendEmail,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,answersControllerCreateAnomalyResolution,answersControllerUpdateAnomalyResolution,answersControllerFindAnomalyResolutionById,answersControllerFindAnomalyResolutionList}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -479,6 +500,7 @@ export type CompaniesControllerRemoveResult = NonNullable<Awaited<ReturnType<Ret
 export type EmployeesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerCreate']>>>
 export type EmployeesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerFindList']>>>
 export type EmployeesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerUpdate']>>>
+export type EmployeesControllerSendEmailResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerSendEmail']>>>
 export type ChecklistsControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerCreate']>>>
 export type ChecklistsControllerFindPaginatedByParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByParams']>>>
 export type ChecklistsControllerFindPaginatedByEmployeeParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByEmployeeParams']>>>
