@@ -15,12 +15,14 @@ import type {
   AnswersControllerFindAnomalyResolutionByIdParams,
   AnswersControllerFindAnswersWithCheckListParams,
   AnswersControllerFindByQuestionIdParams,
+  AnswersControllerFindListParams,
   AnswersWithQuestion,
   AnswersWithQuestions,
   BatchConnectCheckListQuestionsToEmployeeDto,
   BatchConnectCompanyToChecklistDto,
   Categories,
   CheckList,
+  CheckListDto,
   CheckListForSpecificEmployee,
   CheckListItem,
   CheckListItemFormattedList,
@@ -53,7 +55,6 @@ import type {
   TokenDto,
   UpdateAnomalyResolutionDTO,
   UpdateChecklistDto,
-  UpdateChecklistItemDto,
   UpdateCompanyDto,
   UpdateCompanyRelated,
   UpdateCompanySettingsDto,
@@ -251,6 +252,26 @@ const checklistsControllerFindPaginatedByParams = (
       );
     }
   
+const checklistsControllerUpdateCheckListName = (
+    updateChecklistDto: UpdateChecklistDto,
+ ) => {
+      return customInstance<CheckList>(
+      {url: `http://localhost:3000/checklists`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateChecklistDto
+    },
+      );
+    }
+  
+const checklistsControllerFindAll = (
+    
+ ) => {
+      return customInstance<CheckListDto[]>(
+      {url: `http://localhost:3000/checklists/all`, method: 'GET'
+    },
+      );
+    }
+  
 const checklistsControllerFindCheckListPaginatedByParams = (
     params: ChecklistsControllerFindCheckListPaginatedByParamsParams,
  ) => {
@@ -296,7 +317,7 @@ const checklistsControllerUpdateExpiriesTime = (
 const checklistsControllerConnectCheckListToCompany = (
     batchConnectCompanyToChecklistDto: BatchConnectCompanyToChecklistDto[],
  ) => {
-      return customInstance<void>(
+      return customInstance<unknown>(
       {url: `http://localhost:3000/checklists/connect-checklist-company`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: batchConnectCompanyToChecklistDto
@@ -311,28 +332,6 @@ const checklistsControllerConnectEmployeeToCheckList = (
       {url: `http://localhost:3000/checklists/relate-employee-to-checklist`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: batchConnectCheckListQuestionsToEmployeeDto
-    },
-      );
-    }
-  
-const checklistsControllerUpdateCheckListName = (
-    updateChecklistDto: UpdateChecklistDto,
- ) => {
-      return customInstance<CheckList>(
-      {url: `http://localhost:3000/checklists/update-checklist-name`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateChecklistDto
-    },
-      );
-    }
-  
-const checklistsControllerUpdateCheckListItemName = (
-    updateChecklistItemDto: UpdateChecklistItemDto,
- ) => {
-      return customInstance<CheckListItem>(
-      {url: `http://localhost:3000/checklists/update-checklistItem`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateChecklistItemDto
     },
       );
     }
@@ -418,10 +417,11 @@ const questionsControllerFindAll = (
     }
   
 const answersControllerFindList = (
-    
+    params?: AnswersControllerFindListParams,
  ) => {
       return customInstance<AnswersWithQuestion[]>(
-      {url: `http://localhost:3000/answers`, method: 'GET'
+      {url: `http://localhost:3000/answers`, method: 'GET',
+        params
     },
       );
     }
@@ -540,7 +540,7 @@ const answersControllerFindAnomalyResolutionList = (
       );
     }
   
-return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindSettings,companiesControllerUpdateCompanySettings,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,employeesControllerSendEmail,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerFindCheckListPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,checklistsControllerConnectCheckListToCompany,checklistsControllerConnectEmployeeToCheckList,checklistsControllerUpdateCheckListName,checklistsControllerUpdateCheckListItemName,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,answersControllerCreateAnomalyResolution,answersControllerUpdateAnomalyResolution,answersControllerFindAnomalyResolutionById,answersControllerFindAnomalyResolutionList}};
+return {appControllerGetHello,authControllerLoginDashboard,authControllerLoginMobile,authControllerRefreshToken,authControllerGetUserAuth,companiesControllerFindSettings,companiesControllerUpdateCompanySettings,companiesControllerFindAll,companiesControllerCreate,companiesControllerUpdate,companiesControllerFindOne,companiesControllerRemove,employeesControllerCreate,employeesControllerFindList,employeesControllerUpdate,employeesControllerSendEmail,checklistsControllerCreate,checklistsControllerFindPaginatedByParams,checklistsControllerUpdateCheckListName,checklistsControllerFindAll,checklistsControllerFindCheckListPaginatedByParams,checklistsControllerFindPaginatedByEmployeeParams,checklistsControllerUpdateCompanyId,checklistsControllerUpdateExpiriesTime,checklistsControllerConnectCheckListToCompany,checklistsControllerConnectEmployeeToCheckList,rolesControllerFindList,categoriesControllerFindList,categoriesControllerCreate,questionsControllerFindList,questionsControllerCreateQuestion,questionsControllerUpdateQuestion,questionsControllerDeleteQuestion,questionsControllerFindAll,answersControllerFindList,answersControllerCreate,answersControllerFindByQuestionId,answersControllerCreateForImageQuestion,answersControllerCreateForMultipleQuestion,answersControllerFindAnswersWithCheckList,answersControllerCreateAnomalyResolution,answersControllerUpdateAnomalyResolution,answersControllerFindAnomalyResolutionById,answersControllerFindAnomalyResolutionList}};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -564,14 +564,14 @@ export type EmployeesControllerUpdateResult = NonNullable<Awaited<ReturnType<Ret
 export type EmployeesControllerSendEmailResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['employeesControllerSendEmail']>>>
 export type ChecklistsControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerCreate']>>>
 export type ChecklistsControllerFindPaginatedByParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByParams']>>>
+export type ChecklistsControllerUpdateCheckListNameResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdateCheckListName']>>>
+export type ChecklistsControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindAll']>>>
 export type ChecklistsControllerFindCheckListPaginatedByParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindCheckListPaginatedByParams']>>>
 export type ChecklistsControllerFindPaginatedByEmployeeParamsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerFindPaginatedByEmployeeParams']>>>
 export type ChecklistsControllerUpdateCompanyIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdateCompanyId']>>>
 export type ChecklistsControllerUpdateExpiriesTimeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdateExpiriesTime']>>>
 export type ChecklistsControllerConnectCheckListToCompanyResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerConnectCheckListToCompany']>>>
 export type ChecklistsControllerConnectEmployeeToCheckListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerConnectEmployeeToCheckList']>>>
-export type ChecklistsControllerUpdateCheckListNameResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdateCheckListName']>>>
-export type ChecklistsControllerUpdateCheckListItemNameResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['checklistsControllerUpdateCheckListItemName']>>>
 export type RolesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['rolesControllerFindList']>>>
 export type CategoriesControllerFindListResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['categoriesControllerFindList']>>>
 export type CategoriesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getIndicadorOnlineAPI>['categoriesControllerCreate']>>>

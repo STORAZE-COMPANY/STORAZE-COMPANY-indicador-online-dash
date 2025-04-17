@@ -3,7 +3,10 @@ import {
   Button,
   TextField,
   useMediaQuery,
-  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Header } from "../../components";
 import { Formik } from "formik";
@@ -31,6 +34,8 @@ const CreateCompany = () => {
     companiesControllerCreate,
     companiesControllerUpdate,
     companiesControllerFindOne,
+    checklistsControllerFindCheckListPaginatedByParams,
+    checklistsControllerUpdateCompanyId,
   } = getIndicadorOnlineAPI();
 
   const [initialValues, setInitialValues] = useState({
@@ -38,11 +43,23 @@ const CreateCompany = () => {
     cnpj: "",
     email: "",
     isActive: true,
+    checklists: [],
   });
+
+  const [availableChecklists, setAvailableChecklists] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const allChecklists =
+          await checklistsControllerFindCheckListPaginatedByParams({
+            limit: "100",
+            page: "1",
+          });
+
+          console.log("allChecklists", allChecklists)
+        setAvailableChecklists(allChecklists);
+
         if (isEditing) {
           const companyRes = await companiesControllerFindOne(companyId);
           setInitialValues({
@@ -50,6 +67,7 @@ const CreateCompany = () => {
             cnpj: companyRes.cnpj,
             email: companyRes.email,
             isActive: companyRes.isActive,
+            checklists: [], 
           });
         }
       } catch (err) {
@@ -63,23 +81,39 @@ const CreateCompany = () => {
 
   const handleFormSubmit = async (values, actions) => {
     try {
+      const { checklists, ...companyPayload } = values;
+  
       const payload = {
-        ...values,
-        cnpj: values.cnpj.replace(/\D/g, ""),
+        ...companyPayload,
+        cnpj: companyPayload.cnpj.replace(/\D/g, ""),
       };
-
+  
+      let companyIdCreatedOrEdited = companyId;
+  
       if (isEditing) {
         await companiesControllerUpdate({ ...payload, id: companyId });
         toast.success("Empresa atualizada com sucesso!");
       } else {
-        await companiesControllerCreate(payload);
+        const res = await companiesControllerCreate(payload);
+        companyIdCreatedOrEdited = res.id;
         toast.success("Empresa criada com sucesso!");
         actions.resetForm();
       }
-
+  
+      if (checklists.length > 0 && companyIdCreatedOrEdited) {
+        const { checklistsControllerConnectCheckListToCompany } = getIndicadorOnlineAPI();
+  
+        const connectPayload = checklists.map((checklistId) => ({
+          companyId: companyIdCreatedOrEdited,
+          checklistId,
+        }));
+  
+        await checklistsControllerConnectCheckListToCompany(connectPayload);
+      }
+  
       setTimeout(() => {
         navigate("/company");
-      }, 500)
+      }, 500);
     } catch (err) {
       toast.error("Erro ao salvar empresa.");
       console.error(err);
@@ -110,6 +144,7 @@ const CreateCompany = () => {
           handleBlur,
           handleChange,
           handleSubmit,
+          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -117,9 +152,7 @@ const CreateCompany = () => {
               gap="30px"
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
               sx={{
-                "& > div": {
-                  gridColumn: isNonMobile ? undefined : "span 4",
-                },
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
               <TextField
@@ -170,6 +203,23 @@ const CreateCompany = () => {
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
+
+              <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
+                <InputLabel>Relacionar Checklists</InputLabel>
+                <Select
+                  name="checklists"
+                  multiple
+                  value={values.checklists || []}
+                  onChange={(e) => setFieldValue("checklists", e.target.value)}
+                  variant="filled"
+                >
+                  {availableChecklists.map((checklist) => (
+                    <MenuItem key={checklist.id} value={checklist.id}>
+                      {checklist.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt={4}>
@@ -180,6 +230,7 @@ const CreateCompany = () => {
           </form>
         )}
       </Formik>
+
       <ToastContainer />
     </Box>
   );

@@ -16,7 +16,7 @@ import InputMask from "react-input-mask";
 import { ToastContainer, toast } from "react-toastify";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"; // PEGAR EMPRESA DO USUÁRIO
+import { useAuth } from "../../contexts/AuthContext"; 
 
 const employeeSchema = yup.object().shape({
   name: yup.string().required("Campo obrigatório"),
@@ -30,7 +30,7 @@ const employeeSchema = yup.object().shape({
 const CreateEmployees = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dataAuth } = useAuth(); // Pega dados do usuário logado
+  const { dataAuth } = useAuth(); 
   const employee = location.state || null;
   const isEditing = !!employee;
 

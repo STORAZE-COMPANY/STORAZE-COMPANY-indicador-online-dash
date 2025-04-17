@@ -40,10 +40,15 @@ const ChecklistList = () => {
   const fetchChecklists = async () => {
     setLoading(true);
     try {
-      const response = await checklistsControllerFindCheckListPaginatedByParams({
-        limit: rowsPerPage.toString(),
-        page: (page + 1).toString(),
-      });
+      const response = await checklistsControllerFindCheckListPaginatedByParams(
+        {
+          limit: rowsPerPage.toString(),
+          page: (page + 1).toString(),
+        }
+      );
+
+      console.log("response", response);
+
       setChecklists(response);
       setHasNextPage(response.length === rowsPerPage);
     } catch (err) {
@@ -127,7 +132,12 @@ const ChecklistList = () => {
               <Paper
                 key={company.checklistItemId}
                 elevation={3}
-                sx={{ backgroundColor: "#434957", p: 2, borderRadius: 3, mb: 3 }}
+                sx={{
+                  backgroundColor: "#434957",
+                  p: 2,
+                  borderRadius: 3,
+                  mb: 3,
+                }}
               >
                 <Box
                   display="flex"
@@ -140,8 +150,13 @@ const ChecklistList = () => {
                   </Typography>
                   {isAdmin && (
                     <Box>
-                      <Tooltip title="Editar (em breve)">
-                        <IconButton disabled>
+                      <Tooltip title="Editar">
+                        <IconButton
+                          onClick={() =>
+                            {}
+                            /* navigate(`/checklistform/${checklist.id}`) */
+                          }
+                        >
                           <Edit sx={{ color: "#7ec8f2" }} />
                         </IconButton>
                       </Tooltip>
@@ -149,7 +164,9 @@ const ChecklistList = () => {
                         <IconButton
                           aria-label="settings"
                           onClick={() =>
-                            navigate(`/checklists/${company.checklistItemId}/settings`)
+                            navigate(
+                              `/checklists/${company.checklistItemId}/settings`
+                            )
                           }
                         >
                           <SettingsOutlined />
@@ -192,9 +209,10 @@ const ChecklistList = () => {
               labelRowsPerPage="Itens por página:"
               sx={{
                 color: "#fff",
-                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows": {
-                  color: "#fff",
-                },
+                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+                  {
+                    color: "#fff",
+                  },
                 ".MuiSvgIcon-root": { color: "#fff" },
               }}
               nextIconButtonProps={{ disabled: !hasNextPage }}

@@ -12,25 +12,41 @@ const Company = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const { companiesControllerFindAll, companiesControllerRemove } = getIndicadorOnlineAPI();
+  const {
+    companiesControllerFindAll,
+    companiesControllerRemove,
+    checklistsControllerFindCheckListPaginatedByParams,
+  } = getIndicadorOnlineAPI();
 
   const [empresas, setEmpresas] = useState([]);
 
   const fetchCompanies = async () => {
     try {
-      const response = await companiesControllerFindAll();
-      const formatted = response.map((item) => ({
-        id: item.id,
-        nome: item.name,
-        email: item.email,
-        status: item.isActive ? "Ativa" : "Inativa",
-        cidade: "N/A",
-        contacto: "N/A",
-        checklists: [],
-      }));
+      const [companies, checklists] = await Promise.all([
+        companiesControllerFindAll(),
+        checklistsControllerFindCheckListPaginatedByParams({ limit: "100", page: "1" }),
+      ]);
+
+      const formatted = companies.map((company) => {
+        const relatedChecklists = checklists
+          .filter((cl) => cl.companies?.some((c) => Number(c.id) === company.id))
+          .map((cl) => cl.name);
+
+        return {
+          id: company.id,
+          nome: company.name,
+          email: company.email,
+          status: company.isActive ? "Ativa" : "Inativa",
+          cidade: "N/A",
+          contacto: "N/A",
+          checklists: relatedChecklists,
+        };
+      });
+
       setEmpresas(formatted);
     } catch (err) {
-      toast.error("Erro ao buscar empresas");
+      toast.error("Erro ao buscar empresas e checklists");
+      console.error(err);
     }
   };
 
@@ -39,9 +55,6 @@ const Company = () => {
   }, []);
 
   const handleDelete = async (id) => {
-  /*   const confirm = window.confirm("Tem certeza que deseja excluir esta empresa?");
-    if (!confirm) return; */
-
     try {
       await companiesControllerRemove(id);
       toast.success("Empresa excluída com sucesso!");
@@ -75,9 +88,7 @@ const Company = () => {
           alignItems="center"
           justifyContent="center"
           borderRadius={1}
-          bgcolor={
-            status === "Ativa" ? colors.greenAccent[600] : colors.redAccent[400]
-          }
+          bgcolor={status === "Ativa" ? colors.greenAccent[600] : colors.redAccent[400]}
         >
           <Typography color="#fff">{status}</Typography>
         </Box>

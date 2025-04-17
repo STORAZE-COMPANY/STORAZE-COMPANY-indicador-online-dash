@@ -4,6 +4,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   name: "",
@@ -16,6 +17,7 @@ const categorySchema = yup.object().shape({
 const CreateCategory = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { categoriesControllerCreate } = getIndicadorOnlineAPI();
+  const navigate = useNavigate();
 
   const handleFormSubmit = async (values, actions) => {
     try {
@@ -24,7 +26,7 @@ const CreateCategory = () => {
       actions.resetForm({ values: initialValues });
 
       setTimeout(() => {
-        navigate(-1);
+        navigate("/category"); 
       }, 500);
     } catch (err) {
       toast.error("Erro ao criar categoria.");

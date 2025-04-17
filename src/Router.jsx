@@ -70,7 +70,10 @@ const AppRouter = () => {
           <Route path="/checklists" element={<ChecklistList />} />
           <Route path="/checklists/:id/settings" element={<SettingsChecklist />} />
           <Route path="/formresponse" element={<FormResponses />} />
+
           <Route path="/checklistform" element={<ChecklistForm />} />
+          <Route path="/checklistform/:id" element={<ChecklistForm />} />
+
           <Route path="/checklist/:id" element={<ChecklistDetail />} />
 
           <Route path="/contacts" element={<Contacts />} />

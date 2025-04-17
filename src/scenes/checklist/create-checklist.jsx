@@ -22,12 +22,16 @@ import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ChecklistForm = () => {
   const { checklistsControllerCreate, categoriesControllerFindList } =
     getIndicadorOnlineAPI();
     const navigate = useNavigate();
+
+    const { id } = useParams(); 
+    const isEditing = !!id;
+
   const [availableCategories, setAvailableCategories] = useState([]);
   const [checklistName, setChecklistName] = useState("");
   const [categories, setCategories] = useState([
@@ -148,52 +152,54 @@ const ChecklistForm = () => {
 
   const handleSubmit = async () => {
     try {
-      const filteredChecklistItems = categories
-        .filter((cat) => !!cat.categoryName && cat.questions.length > 0)
-        .map((cat) => ({
-          categoriesId: cat.categoryName,
-          question_list: cat.questions
-            .filter((q) => q.questionText.trim() !== "")
-            .map((q) => ({
-              question: q.questionText,
-              type: q.questionType,
-              isRequired: q.isRequired,
-              answerType:
-                q.questionType === "Upload de arquivo"
-                  ? "Image"
-                  : q.promptIA
-                  ? "IA"
-                  : "Text",
-              iaPrompt: q.promptIA || undefined,
-
-              multiple_choice:
-                q.questionType === "Múltipla escolha"
-                  ? q.options.map((opt) => ({
-                      choice: opt.value,
-                    }))
-                  : [],
-            })),
-        }))
-        .filter((item) => item.question_list.length > 0);
-
+      const questionList = categories.flatMap((cat) =>
+        cat.questions
+          .filter((q) => q.questionText.trim() !== "")
+          .map((q) => ({
+            question: q.questionText,
+            category_id: cat.categoryName, 
+            type: q.questionType,
+            isRequired: q.isRequired,
+            answerType:
+              q.questionType === "Upload de arquivo"
+                ? "Image"
+                : q.promptIA
+                ? "IA"
+                : "Text",
+            iaPrompt: q.promptIA || "",
+            multiple_choice:
+              q.questionType === "Múltipla escolha"
+                ? q.options.map((opt) => ({
+                    choice: opt.value,
+                    anomalyStatus:
+                      opt.anomalyLevel === "HIGH"
+                        ? "ANOMALIA_RESTRITIVA"
+                        : opt.anomalyLevel === "MEDIUM"
+                        ? "ANOMALIA"
+                        : undefined,
+                  }))
+                : [],
+          }))
+      );
+  
       if (!checklistName.trim()) {
         toast.error("O nome do checklist é obrigatório.");
         return;
       }
-
-      if (filteredChecklistItems.length === 0) {
-        toast.error("Adicione pelo menos uma categoria com perguntas válidas.");
+  
+      if (questionList.length === 0) {
+        toast.error("Adicione pelo menos uma pergunta válida.");
         return;
       }
-
+  
       const payload = {
         name: checklistName,
-        checkListItem: filteredChecklistItems,
+        question_list: questionList,
       };
-
+  
       await checklistsControllerCreate(payload);
       toast.success("Checklist publicado com sucesso!");
-
+  
       setChecklistName("");
       setCategories([
         {
@@ -211,7 +217,7 @@ const ChecklistForm = () => {
           ],
         },
       ]);
-
+  
       setTimeout(() => {
         navigate("/checklists");
       }, 500);

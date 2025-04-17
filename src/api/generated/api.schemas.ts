@@ -261,6 +261,8 @@ export const CheckListQuestionsDtoType = {
 export interface CheckListQuestionsDto {
   /** Pergunta */
   question: string;
+  /** ID da categoria */
+  category_id: string;
   /** Tipo de resposta esperada para a pergunta */
   answerType: CheckListQuestionsDtoAnswerType;
   /** Tipo da pergunta */
@@ -273,18 +275,11 @@ export interface CheckListQuestionsDto {
   multiple_choice?: CheckListMultipleChoiceDto[];
 }
 
-export interface CreateCheckListItemDto {
-  /** categories_id */
-  categoriesId: string;
-  /** Lista de perguntas */
-  question_list: CheckListQuestionsDto[];
-}
-
 export interface CreateCheckListDto {
   /** Nome do checklist */
   name: string;
-  /** CheckListItem */
-  checkListItem: CreateCheckListItemDto[];
+  /** categories_id */
+  question_list: CheckListQuestionsDto[];
 }
 
 export interface CheckList {
@@ -305,8 +300,6 @@ export interface CheckList {
 export interface CheckListItemFormattedList {
   /** id */
   checklistItemId: string;
-  /** categories_id */
-  categories_id: string;
   /** checkList_id */
   checkList_id: string;
   /** created_at */
@@ -325,6 +318,24 @@ export interface CheckListItemFormattedList {
   hasAnomalies: boolean;
 }
 
+export interface CheckListQuestions { [key: string]: unknown }
+
+export interface CheckListDto {
+  /** ID do check List */
+  id: string;
+  /** Nome do checklist */
+  name: string;
+  /** Data de expiração */
+  expiries_in: string;
+  /** tempo de expiração das imagens das questões vinculadas ao checklist */
+  images_expiries_in: string;
+  /** Data de criação */
+  created_at: string;
+  /** Última atualização */
+  updated_at: string;
+  questions: CheckListQuestions[][];
+}
+
 export interface GroupedCheckList {
   /** ID do checklist */
   id: string;
@@ -339,8 +350,6 @@ export interface CheckListForSpecificEmployee {
   checklistId: string;
   /** Nome do checklist */
   checklistName: string;
-  /** Nome da categoria do checklist */
-  categoryName: string;
 }
 
 export interface UpdateCompanyRelated {
@@ -353,8 +362,6 @@ export interface UpdateCompanyRelated {
 export interface CheckListItem {
   /** id */
   id: string;
-  /** categories_id */
-  categories_id: string;
   /** checkList_id */
   checkList_id: string;
   /** created_at */
@@ -379,9 +386,9 @@ export interface BatchConnectCompanyToChecklistDto {
   companyId: number;
   /** The ID of the checklist to connect to the company */
   checklistId: string;
-  /** id of the category */
-  categories_id: string;
 }
+
+export interface UnprocessableEntityException { [key: string]: unknown }
 
 export interface BatchConnectCheckListQuestionsToEmployeeDto {
   /** The ID of the checklist to connect to the company */
@@ -397,13 +404,6 @@ export interface UpdateChecklistDto {
   checkListId: string;
   /** Nome do checklist */
   name?: string;
-}
-
-export interface UpdateChecklistItemDto {
-  /** ID do check List */
-  checkListItemId: string;
-  /** ID da categoria */
-  categoryId?: string;
 }
 
 export interface Roles {
@@ -474,7 +474,7 @@ export interface QuestionsWithChoices {
   /** Se a questão é obrigatória */
   isRequired: boolean;
   /** ID do checklist */
-  checkListItem_id: string;
+  checklist_id: string;
   /**
    * Prompt da IA
    * @nullable
@@ -498,26 +498,39 @@ export interface ChoicesDto {
   anomaly?: ChoicesDtoAnomaly;
 }
 
+/**
+ * type
+ */
+export type QuestionDtoType = typeof QuestionDtoType[keyof typeof QuestionDtoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const QuestionDtoType = {
+  Texto: 'Texto',
+  Múltipla_escolha: 'Múltipla escolha',
+  Upload_de_arquivo: 'Upload de arquivo',
+} as const;
+
 export interface QuestionDto {
   /** question */
   question: string;
   /** type */
-  type: string;
+  type: QuestionDtoType;
   /** employee_id */
   employee_id: number;
   /** isRequired */
   isRequired: boolean;
-  /** checkListItem_id */
-  checkListItem_id: string;
+  /** checklist_id */
+  checklist_id: string;
   /** IAPrompt */
   IAPrompt: string;
   /** answerType */
   answerType: string;
+  /** category_id */
+  category_id: string;
   /** Caso tenha múltipla escolha, as opções de resposta */
   choices?: ChoicesDto[];
 }
-
-export interface UnprocessableEntityException { [key: string]: unknown }
 
 export interface UpdateQuestion {
   /** id */
@@ -530,10 +543,12 @@ export interface UpdateQuestion {
   employee_id?: number;
   /** isRequired */
   isRequired?: boolean;
-  /** checkListItem_id */
+  /** checklist_id */
   checkListItem_id?: string;
   /** IAPrompt */
   IAPrompt?: string;
+  /** category_id */
+  category_id?: string;
   /** answerType */
   answerType?: string;
 }
@@ -559,7 +574,7 @@ export interface CreateAnswerDto {
   /** ID da pergunta */
   question_id: string;
   /** ID do funcionário */
-  employee_id: number;
+  employee_id: string;
   /** Resposta da pergunta */
   textAnswer: string;
 }
@@ -772,6 +787,10 @@ limit: string;
  * Página de registros
  */
 page: string;
+/**
+ * Buscar por query
+ */
+query?: string;
 };
 
 export type ChecklistsControllerFindCheckListPaginatedByParamsParams = {
@@ -795,6 +814,10 @@ limit: string;
  * Página de registros
  */
 page: string;
+/**
+ * Buscar por query
+ */
+query?: string;
 };
 
 export type ChecklistsControllerFindPaginatedByEmployeeParamsParams = {
@@ -802,10 +825,14 @@ export type ChecklistsControllerFindPaginatedByEmployeeParamsParams = {
  * ID do funcionário
  */
 employeeId: string;
+/**
+ * Buscar por query
+ */
+query?: string;
 };
 
 export type QuestionsControllerFindListParams = {
-checkListItemId: string;
+checklistId: string;
 /**
  * Limite de registros por página
  */
@@ -818,6 +845,13 @@ page: string;
 
 export type QuestionsControllerDeleteQuestionParams = {
 questionId: string;
+};
+
+export type AnswersControllerFindListParams = {
+/**
+ * ID do funcionário
+ */
+employee_id?: string;
 };
 
 export type AnswersControllerFindByQuestionIdParams = {
