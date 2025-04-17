@@ -23,6 +23,7 @@ const Employees = () => {
   const {
     employeesControllerFindList,
     employeesControllerRemove,
+    checklistsControllerFindPaginatedByEmployeeParams,
   } = getIndicadorOnlineAPI();
 
   const [employees, setEmployees] = useState([]);
@@ -39,16 +40,30 @@ const Employees = () => {
         limit: rowsPerPage.toString(),
       });
 
-      const formatted = response.map((item) => ({
-        id: item.id,
-        nome: item.name,
-        email: item.email,
-        telefone: item.phone,
-        empresa: item.company_name,
-        nivel: item.role_name,
-        company_id: item.company_id,
-        role_id: item.role_id,
-      }));
+      const formatted = await Promise.all(
+        response.map(async (item) => {
+          let relatedChecklists = [];
+          try {
+            relatedChecklists = await checklistsControllerFindPaginatedByEmployeeParams({
+              employeeId: item.id.toString(),
+            });
+          } catch (err) {
+            console.error(`Erro ao buscar checklists do funcionário ${item.name}`);
+          }
+
+          return {
+            id: item.id,
+            nome: item.name,
+            email: item.email,
+            telefone: item.phone,
+            empresa: item.company_name,
+            nivel: item.role_name,
+            company_id: item.company_id,
+            role_id: item.role_id,
+            checklistsRelacionados: relatedChecklists.map((cl) => cl.checklistName).join(", "),
+          };
+        })
+      );
 
       setEmployees(formatted);
       setHasNextPage(response.length === rowsPerPage);
@@ -93,6 +108,7 @@ const Employees = () => {
     { field: "telefone", headerName: "Telefone", flex: 1 },
     { field: "empresa", headerName: "Empresa", flex: 1 },
     { field: "nivel", headerName: "Nível de Acesso", flex: 1 },
+    { field: "checklistsRelacionados", headerName: "Checklists Relacionados", flex: 1.5 },
     {
       field: "acoes",
       headerName: "Ações",

@@ -330,10 +330,6 @@ export interface GroupedCheckList {
   id: string;
   /** Nome do checklist */
   name: string;
-  /** ID da categoria do checklist */
-  categories_id: string;
-  /** Indica se o checklist possui anomalias */
-  hasAnomalies: boolean;
   /** Lista de empresas associadas ao checklist */
   companies: Company[];
 }
@@ -385,6 +381,29 @@ export interface BatchConnectCompanyToChecklistDto {
   checklistId: string;
   /** id of the category */
   categories_id: string;
+}
+
+export interface BatchConnectCheckListQuestionsToEmployeeDto {
+  /** The ID of the checklist to connect to the company */
+  checklistId: string;
+  /** Employee ID to connect to the checklist */
+  employee_id: number;
+}
+
+export interface Question { [key: string]: unknown }
+
+export interface UpdateChecklistDto {
+  /** ID do check List */
+  checkListId: string;
+  /** Nome do checklist */
+  name?: string;
+}
+
+export interface UpdateChecklistItemDto {
+  /** ID do check List */
+  checkListItemId: string;
+  /** ID da categoria */
+  categoryId?: string;
 }
 
 export interface Roles {
@@ -498,8 +517,6 @@ export interface QuestionDto {
   choices?: ChoicesDto[];
 }
 
-export interface Question { [key: string]: unknown }
-
 export interface UnprocessableEntityException { [key: string]: unknown }
 
 export interface UpdateQuestion {
@@ -521,7 +538,7 @@ export interface UpdateQuestion {
   answerType?: string;
 }
 
-export interface Answers {
+export interface AnswersWithQuestion {
   /** id */
   id: string;
   /** textAnswer */
@@ -534,6 +551,8 @@ export interface Answers {
   employee_id: number;
   /** anomalyStatus */
   anomalyStatus: string;
+  /** Question */
+  question: string;
 }
 
 export interface CreateAnswerDto {
@@ -560,6 +579,21 @@ export interface AnswerResponse {
   anomalyStatus: string;
   /** Resposta da IA */
   openIaResponse: string;
+}
+
+export interface Answers {
+  /** id */
+  id: string;
+  /** textAnswer */
+  textAnswer?: string;
+  /** imageAnswer */
+  imageAnswer?: string;
+  /** question_id */
+  question_id: string;
+  /** employee_id */
+  employee_id: number;
+  /** anomalyStatus */
+  anomalyStatus: string;
 }
 
 export interface CreateAnswerChoice {

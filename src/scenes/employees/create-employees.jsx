@@ -1,22 +1,22 @@
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
   TextField,
-  useMediaQuery,
   Typography,
-  MenuItem,
   FormControl,
   InputLabel,
   Select,
+  MenuItem,
 } from "@mui/material";
 import { Header } from "../../components";
 import { Formik } from "formik";
 import * as yup from "yup";
 import InputMask from "react-input-mask";
 import { ToastContainer, toast } from "react-toastify";
-import { useEffect, useState } from "react";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext"; // PEGAR EMPRESA DO USUÁRIO
 
 const employeeSchema = yup.object().shape({
   name: yup.string().required("Campo obrigatório"),
@@ -24,12 +24,13 @@ const employeeSchema = yup.object().shape({
   phone: yup.string().required("Campo obrigatório"),
   company_id: yup.string().required("Empresa obrigatória"),
   roleId: yup.string().required("Nível de acesso obrigatório"),
+  selectedChecklists: yup.array().of(yup.string()),
 });
 
 const CreateEmployees = () => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
   const navigate = useNavigate();
   const location = useLocation();
+  const { dataAuth } = useAuth(); // Pega dados do usuário logado
   const employee = location.state || null;
   const isEditing = !!employee;
 
@@ -39,37 +40,49 @@ const CreateEmployees = () => {
     employeesControllerFindList,
     rolesControllerFindList,
     companiesControllerFindAll,
+    checklistsControllerFindCheckListPaginatedByParams,
+    checklistsControllerConnectEmployeeToCheckList,
   } = getIndicadorOnlineAPI();
 
   const [roles, setRoles] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [checklists, setChecklists] = useState([]);
+
   const [formValues, setFormValues] = useState({
     name: "",
     email: "",
     phone: "",
     company_id: "",
     roleId: "",
+    selectedChecklists: [],
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [rolesRes, companiesRes] = await Promise.all([
+        const [rolesRes, companiesRes, checklistsRes] = await Promise.all([
           rolesControllerFindList(),
           companiesControllerFindAll(),
+          checklistsControllerFindCheckListPaginatedByParams({
+            limit: "100",
+            page: "1",
+            byCompany: Number(dataAuth?.user?.company_id),
+          }),
         ]);
+
         setRoles(rolesRes);
         setCompanies(companiesRes);
+        setChecklists(checklistsRes);
 
         if (isEditing && employee?.id) {
           const allEmployees = await employeesControllerFindList({
             limit: "100",
             page: "1",
           });
-
           const current = allEmployees.find((e) => e.id === employee.id);
-
-          const matchedRole = rolesRes.find((r) => r.name === current.role_name);
+          const matchedRole = rolesRes.find(
+            (r) => r.name === current?.role_name
+          );
 
           if (current) {
             setFormValues({
@@ -78,6 +91,7 @@ const CreateEmployees = () => {
               phone: current.phone || "",
               company_id: String(current.company_id || ""),
               roleId: matchedRole?.id || "",
+              selectedChecklists: [],
             });
           }
         }
@@ -88,28 +102,50 @@ const CreateEmployees = () => {
     };
 
     fetchData();
-  }, []);
+  }, [isEditing, employee, dataAuth]);
 
   const handleFormSubmit = async (values, actions) => {
     try {
-      const payload = {
-        name: values.name,
-        email: values.email,
-        phone: values.phone.replace(/\D/g, ""),
-        company_id: Number(values.company_id),
-        role_id: values.roleId,
-      };
-
+      let employeeId = null;
+  
       if (isEditing) {
-        await employeesControllerUpdate({ ...payload, id: employee.id });
+        const payloadUpdate = {
+          id: employee.id,
+          name: values.name,
+          email: values.email,
+          phone: values.phone.replace(/\D/g, ""),
+          company_id: Number(values.company_id),
+          role_id: values.roleId, 
+        };
+  
+        await employeesControllerUpdate(payloadUpdate);
+        employeeId = employee.id;
         toast.success("Funcionário atualizado com sucesso!");
       } else {
-        await employeesControllerCreate(payload);
+        const payloadCreate = {
+          name: values.name,
+          email: values.email,
+          phone: values.phone.replace(/\D/g, ""),
+          company_id: Number(values.company_id),
+          roleId: values.roleId, 
+        };
+  
+        const res = await employeesControllerCreate(payloadCreate);
+        employeeId = res.id;
         toast.success("Funcionário criado com sucesso!");
         actions.resetForm();
       }
-
-      setTimeout(() => navigate(-1), 600);
+  
+      if (values.selectedChecklists.length > 0 && employeeId) {
+        for (const checklistId of values.selectedChecklists) {
+          await checklistsControllerConnectEmployeeToCheckList({
+            checklistId,
+            employee_id: employeeId,
+          });
+        }
+      }
+  
+      setTimeout(() => navigate("/employees"), 1000);
     } catch (err) {
       toast.error("Erro ao salvar funcionário.");
       console.error(err);
@@ -147,16 +183,10 @@ const CreateEmployees = () => {
               display="grid"
               gap="30px"
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": {
-                  gridColumn: isNonMobile ? undefined : "span 4",
-                },
-              }}
             >
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
                 label="Nome"
                 name="name"
                 onBlur={handleBlur}
@@ -170,7 +200,6 @@ const CreateEmployees = () => {
               <TextField
                 fullWidth
                 variant="filled"
-                type="email"
                 label="Email"
                 name="email"
                 onBlur={handleBlur}
@@ -192,7 +221,6 @@ const CreateEmployees = () => {
                     {...inputProps}
                     fullWidth
                     variant="filled"
-                    type="text"
                     label="Telefone"
                     name="phone"
                     error={touched.phone && !!errors.phone}
@@ -203,9 +231,7 @@ const CreateEmployees = () => {
               </InputMask>
 
               <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="company-label" sx={{ color: "#999" }}>
-                  Empresa
-                </InputLabel>
+                <InputLabel id="company-label">Empresa</InputLabel>
                 <Select
                   labelId="company-label"
                   name="company_id"
@@ -213,7 +239,6 @@ const CreateEmployees = () => {
                   onChange={(e) => setFieldValue("company_id", e.target.value)}
                   onBlur={handleBlur}
                   variant="filled"
-                  sx={{ color: "#fff" }}
                   error={touched.company_id && !!errors.company_id}
                 >
                   {companies.map((company) => (
@@ -222,17 +247,10 @@ const CreateEmployees = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                {touched.company_id && errors.company_id && (
-                  <Typography color="error" fontSize={13}>
-                    {errors.company_id}
-                  </Typography>
-                )}
               </FormControl>
 
               <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="role-label" sx={{ color: "#999" }}>
-                  Nível de Acesso
-                </InputLabel>
+                <InputLabel id="role-label">Nível de Acesso</InputLabel>
                 <Select
                   labelId="role-label"
                   name="roleId"
@@ -240,15 +258,15 @@ const CreateEmployees = () => {
                   onChange={(e) => setFieldValue("roleId", e.target.value)}
                   onBlur={handleBlur}
                   variant="filled"
-                  sx={{ color: "#fff" }}
                   error={touched.roleId && !!errors.roleId}
                 >
                   {roles.map((role) => {
-                    const roleDisplayName = {
-                      superAdmin: "Administrador do sistema",
-                      admin: "Gestor",
-                      user: "Usuário",
-                    }[role.name] || role.name;
+                    const roleDisplayName =
+                      {
+                        superAdmin: "Administrador do sistema",
+                        admin: "Gestor",
+                        user: "Usuário",
+                      }[role.name] || role.name;
 
                     return (
                       <MenuItem key={role.id} value={role.id}>
@@ -257,11 +275,28 @@ const CreateEmployees = () => {
                     );
                   })}
                 </Select>
-                {touched.roleId && errors.roleId && (
-                  <Typography color="error" fontSize={13}>
-                    {errors.roleId}
-                  </Typography>
-                )}
+              </FormControl>
+
+              <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="checklists-label">
+                  Checklists Permitidos
+                </InputLabel>
+                <Select
+                  labelId="checklists-label"
+                  multiple
+                  name="selectedChecklists"
+                  value={values.selectedChecklists}
+                  onChange={(e) =>
+                    setFieldValue("selectedChecklists", e.target.value)
+                  }
+                  variant="filled"
+                >
+                  {checklists.map((cl) => (
+                    <MenuItem key={cl.id} value={cl.id}>
+                      {cl.name}
+                    </MenuItem>
+                  ))}
+                </Select>
               </FormControl>
             </Box>
 
