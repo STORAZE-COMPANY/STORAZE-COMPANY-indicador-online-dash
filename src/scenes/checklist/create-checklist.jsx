@@ -22,11 +22,12 @@ import { AddCircleOutline, Delete, CloseOutlined } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
+import { useNavigate } from "react-router-dom";
 
 const ChecklistForm = () => {
   const { checklistsControllerCreate, categoriesControllerFindList } =
     getIndicadorOnlineAPI();
-
+    const navigate = useNavigate();
   const [availableCategories, setAvailableCategories] = useState([]);
   const [checklistName, setChecklistName] = useState("");
   const [categories, setCategories] = useState([
@@ -164,7 +165,7 @@ const ChecklistForm = () => {
                   ? "IA"
                   : "Text",
               iaPrompt: q.promptIA || undefined,
-              
+
               multiple_choice:
                 q.questionType === "Múltipla escolha"
                   ? q.options.map((opt) => ({
@@ -193,10 +194,6 @@ const ChecklistForm = () => {
       await checklistsControllerCreate(payload);
       toast.success("Checklist publicado com sucesso!");
 
-      setTimeout(() => {
-        navigate(-1);
-      }, 500);
-
       setChecklistName("");
       setCategories([
         {
@@ -214,6 +211,10 @@ const ChecklistForm = () => {
           ],
         },
       ]);
+
+      setTimeout(() => {
+        navigate("/checklists");
+      }, 500);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao publicar o checklist!");

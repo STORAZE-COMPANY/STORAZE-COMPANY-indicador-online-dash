@@ -17,16 +17,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
 
 const SettingsChecklist = () => {
-  const { id: checkListId } = useParams(); 
+  const { id: checklistId } = useParams();
   const {
-    companiesControllerFindAll, 
+    companiesControllerFindAll,
     checklistsControllerUpdateExpiriesTime,
-    checklistsControllerUpdateCompanyId
+    checklistsControllerConnectCheckListToCompany,
   } = getIndicadorOnlineAPI();
 
   const [companies, setCompanies] = useState([]);
   const [expirationDate, setExpirationDate] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedCompanies, setSelectedCompanies] = useState([]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -46,24 +46,14 @@ const SettingsChecklist = () => {
       toast.error("Insira uma data válida.");
       return;
     }
-  
-    if (!checkListId) {
-      toast.error("Checklist ainda não carregado.");
-      return;
-    }
-  
+
     try {
-      // Converte a data para o formato ISO correto com hora 23:59:59
-      const fullDate = new Date(`${expirationDate}T23:59:59`);
-      const isoDate = fullDate.toISOString();
-  
-      const payload = {
+      const isoDate = new Date(`${expirationDate}T23:59:59.000Z`).toISOString();
+      await checklistsControllerUpdateExpiriesTime({
         expiriesTime: isoDate,
         imagesExpiriesTime: isoDate,
-        checkListId,
-      };
-  
-      await checklistsControllerUpdateExpiriesTime(payload);
+        checkListId: checklistId,
+      });
       toast.success("Data de expiração atualizada com sucesso!");
     } catch (error) {
       console.error(error);
@@ -71,27 +61,25 @@ const SettingsChecklist = () => {
     }
   };
 
-  const handleUpdateCompanies = async () => {
-    if (!selectedCompany) {
-      toast.error("Selecione uma empresa.");
+  const handleConnectCompanies = async () => {
+    if (!selectedCompanies.length) {
+      toast.error("Selecione ao menos uma empresa.");
       return;
     }
+
     try {
-      const payload = {
-        companyId: Number(selectedCompany),
-        checkListItemId: checkListId,
-      };
-      await checklistsControllerUpdateCompanyId(payload);
-      toast.success("Empresa relacionada atualizada com sucesso!");
+      const payload = selectedCompanies.map((companyId) => ({
+        companyId: Number(companyId),
+        checklistId,
+        categories_id: "",
+      }));
+
+      await checklistsControllerConnectCheckListToCompany(payload);
+      toast.success("Empresas conectadas ao checklist com sucesso!");
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao atualizar a empresa relacionada.");
+      toast.error("Erro ao conectar empresas ao checklist.");
     }
-  };
-
-  const handleSave = async () => {
-    await handleUpdateExpiries();
-    await handleUpdateCompanies();
   };
 
   return (
@@ -100,7 +88,6 @@ const SettingsChecklist = () => {
         Configuração do Checklist
       </Typography>
 
-      {/* Seção de atualização da data de expiração */}
       <Box mb={4}>
         <Typography variant="h6" mb={2}>
           Configurar Data de Expiração
@@ -124,37 +111,38 @@ const SettingsChecklist = () => {
         </Box>
       </Box>
 
-      {/* Seção de seleção da empresa relacionada */}
       <Box mb={4}>
         <Typography variant="h6" mb={2}>
-          Configurar Empresa Relacionada
+          Conectar Empresas ao Checklist
         </Typography>
         <FormControl fullWidth sx={{ backgroundColor: "#3b4050", mb: 2 }}>
-          <InputLabel sx={{ color: "#fff" }}>Empresa</InputLabel>
+          <InputLabel sx={{ color: "#fff" }}>Empresas</InputLabel>
           <Select
-            value={selectedCompany}
-            onChange={(e) => setSelectedCompany(e.target.value)}
-            input={<OutlinedInput label="Empresa" />}
+            multiple
+            value={selectedCompanies}
+            onChange={(e) => setSelectedCompanies(e.target.value)}
+            input={<OutlinedInput label="Empresas" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => {
+                  const company = companies.find((c) => c.id.toString() === value);
+                  return <Chip key={value} label={company?.name || value} />;
+                })}
+              </Box>
+            )}
             sx={{ color: "#fff" }}
           >
             {companies.map((company) => (
-              <MenuItem key={company.id} value={company.id}>
+              <MenuItem key={company.id} value={company.id.toString()}>
                 {company.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
-        <Button variant="contained" color="secondary" onClick={handleUpdateCompanies}>
-          ATUALIZAR EMPRESA
+        <Button variant="contained" color="secondary" onClick={handleConnectCompanies}>
+          CONECTAR EMPRESAS
         </Button>
       </Box>
-
-      {/* Botão para salvar ambas as configurações */}
-     {/*  <Box>
-        <Button variant="contained" color="success" onClick={handleSave}>
-          SALVAR CONFIGURAÇÕES
-        </Button>
-      </Box> */}
 
       <ToastContainer />
     </Box>

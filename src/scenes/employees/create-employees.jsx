@@ -66,14 +66,18 @@ const CreateEmployees = () => {
             limit: "100",
             page: "1",
           });
+
           const current = allEmployees.find((e) => e.id === employee.id);
+
+          const matchedRole = rolesRes.find((r) => r.name === current.role_name);
+
           if (current) {
             setFormValues({
               name: current.name || "",
               email: current.email || "",
               phone: current.phone || "",
               company_id: String(current.company_id || ""),
-              roleId: current.role_id || "",
+              roleId: matchedRole?.id || "",
             });
           }
         }
@@ -239,11 +243,19 @@ const CreateEmployees = () => {
                   sx={{ color: "#fff" }}
                   error={touched.roleId && !!errors.roleId}
                 >
-                  {roles.map((role) => (
-                    <MenuItem key={role.id} value={role.id}>
-                      {role.name}
-                    </MenuItem>
-                  ))}
+                  {roles.map((role) => {
+                    const roleDisplayName = {
+                      superAdmin: "Administrador do sistema",
+                      admin: "Gestor",
+                      user: "Usuário",
+                    }[role.name] || role.name;
+
+                    return (
+                      <MenuItem key={role.id} value={role.id}>
+                        {roleDisplayName}
+                      </MenuItem>
+                    );
+                  })}
                 </Select>
                 {touched.roleId && errors.roleId && (
                   <Typography color="error" fontSize={13}>

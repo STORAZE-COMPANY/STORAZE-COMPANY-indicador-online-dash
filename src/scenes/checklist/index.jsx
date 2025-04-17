@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getIndicadorOnlineAPI } from "../../api/generated/api";
-import { useAuth } from "../../contexts/AuthContext"; // <- Importa contexto
+import { useAuth } from "../../contexts/AuthContext";
 
 const ChecklistList = () => {
   const [checklists, setChecklists] = useState([]);
@@ -29,22 +29,21 @@ const ChecklistList = () => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const navigate = useNavigate();
 
-  const { dataAuth } = useAuth(); // <- Pega o papel do usuário
+  const { dataAuth } = useAuth();
   const isAdmin = dataAuth?.user?.role === "superAdmin";
 
   const {
-    checklistsControllerFindPaginatedByParams,
+    checklistsControllerFindCheckListPaginatedByParams,
     checklistsControllerRemove,
   } = getIndicadorOnlineAPI();
 
   const fetchChecklists = async () => {
     setLoading(true);
     try {
-      const response = await checklistsControllerFindPaginatedByParams({
+      const response = await checklistsControllerFindCheckListPaginatedByParams({
         limit: rowsPerPage.toString(),
         page: (page + 1).toString(),
       });
-
       setChecklists(response);
       setHasNextPage(response.length === rowsPerPage);
     } catch (err) {
@@ -59,9 +58,9 @@ const ChecklistList = () => {
     fetchChecklists();
   }, [page, rowsPerPage]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (checklistItemId) => {
     try {
-      await checklistsControllerRemove(id);
+      await checklistsControllerRemove(checklistItemId);
       toast.success("Checklist removido com sucesso!");
       fetchChecklists();
     } catch (err) {
@@ -123,64 +122,64 @@ const ChecklistList = () => {
         <Typography variant="body1">Nenhum checklist encontrado.</Typography>
       ) : (
         <>
-          {checklists.map((checklist) => (
-            <Paper
-              key={checklist.checklistItemId}
-              elevation={3}
-              sx={{ backgroundColor: "#434957", p: 2, borderRadius: 3, mb: 3 }}
-            >
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={1}
+          {checklists.map((checklist) =>
+            checklist.companies.map((company) => (
+              <Paper
+                key={company.checklistItemId}
+                elevation={3}
+                sx={{ backgroundColor: "#434957", p: 2, borderRadius: 3, mb: 3 }}
               >
-                <Typography variant="h6" color="#fff">
-                  {checklist.checklistName}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
+                  <Typography variant="h6" color="#fff">
+                    {checklist.name}
+                  </Typography>
+                  {isAdmin && (
+                    <Box>
+                      <Tooltip title="Editar (em breve)">
+                        <IconButton disabled>
+                          <Edit sx={{ color: "#7ec8f2" }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Configuração">
+                        <IconButton
+                          aria-label="settings"
+                          onClick={() =>
+                            navigate(`/checklists/${company.checklistItemId}/settings`)
+                          }
+                        >
+                          <SettingsOutlined />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Excluir">
+                        <IconButton
+                          onClick={() => handleDelete(company.checklistItemId)}
+                        >
+                          <Delete sx={{ color: "#f44336" }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  )}
+                </Box>
+
+                <Divider sx={{ backgroundColor: "#7ec8f2", mb: 1 }} />
+
+                <Typography variant="body2" color="gray">
+                  Empresa: {company.name || "Não vinculada"}
                 </Typography>
-                {isAdmin && (
-                  <Box>
-                    <Tooltip title="Editar (em breve)">
-                      <IconButton disabled>
-                        <Edit sx={{ color: "#7ec8f2" }} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Configuração">
-                      <IconButton
-                        aria-label="settings"
-                        onClick={() =>
-                          navigate(
-                            `/checklists/${checklist.checklistItemId}/settings`
-                          )
-                        }
-                      >
-                        <SettingsOutlined />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Excluir">
-                      <IconButton
-                        onClick={() => handleDelete(checklist.checklistItemId)}
-                      >
-                        <Delete sx={{ color: "#f44336" }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                )}
-              </Box>
-
-              <Divider sx={{ backgroundColor: "#7ec8f2", mb: 1 }} />
-
-              <Typography variant="body2" color="gray">
-                Empresa: {checklist.companyName || "Não vinculada"}
-              </Typography>
-              <Typography variant="body2" color="gray">
-                Categoria ID: {checklist.categories_id}
-              </Typography>
-              <Typography variant="body2" color="gray">
-                Contém anomalias? {checklist.hasAnomalies ? "Sim" : "Não"}
-              </Typography>
-            </Paper>
-          ))}
+                <Typography variant="body2" color="gray">
+                  Categoria ID: {checklist.categories_id}
+                </Typography>
+                <Typography variant="body2" color="gray">
+                  Contém anomalias? {checklist.hasAnomalies ? "Sim" : "Não"}
+                </Typography>
+              </Paper>
+            ))
+          )}
 
           <Box display="flex" justifyContent="flex-end" mt={2}>
             <TablePagination
@@ -193,8 +192,9 @@ const ChecklistList = () => {
               labelRowsPerPage="Itens por página:"
               sx={{
                 color: "#fff",
-                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
-                  { color: "#fff" },
+                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows": {
+                  color: "#fff",
+                },
                 ".MuiSvgIcon-root": { color: "#fff" },
               }}
               nextIconButtonProps={{ disabled: !hasNextPage }}
